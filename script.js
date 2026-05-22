@@ -1429,7 +1429,7 @@ const renderAdminTabContent = async () => {
                 </div>
                 <div class="form-group col-span-2">
                   <label for="crud-image">Product Photo (Upload Image) *</label>
-                  <input type="file" id="crud-image" accept="image/*" required onchange="handleImageUpload(event)">
+                  <input type="file" id="crud-image" accept="image/*" onchange="handleImageUpload(event)">
                   <input type="hidden" id="crud-image-b64">
                   <img id="crud-image-preview" src="" style="max-height: 120px; display: none; margin-top: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
                 </div>
