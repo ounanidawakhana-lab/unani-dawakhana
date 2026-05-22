@@ -508,7 +508,12 @@ const renderCartItems = () => {
     `;
   }).join("");
 
-  if (subtotalText) subtotalText.innerText = `₹${subtotal}`;
+  const platformFee = 5;
+  const toPay = subtotal + platformFee;
+  
+  if (subtotalText) subtotalText.innerText = `₹${toPay}`;
+  const itemTotalText = document.getElementById("cart-item-total");
+  if (itemTotalText) itemTotalText.innerText = `₹${subtotal}`;
 };
 
 // Make updateCartQty global so inline onclick works

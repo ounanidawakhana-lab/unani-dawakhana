@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <!-- Splash Screen -->
@@ -65,11 +65,34 @@
     </div>
     <div class="cart-items" id="cart-items-container"></div>
     <div class="cart-footer-details" id="cart-footer-details" style="display:none; flex-direction:column; gap:16px;">
-      <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; color:var(--primary);">
-        <span>Subtotal</span>
-        <span id="cart-subtotal">₹0</span>
+      
+      <!-- Bill Details Section -->
+      <div style="background: var(--primary-ultra-light); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+        <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 4px; font-size: 1rem;">Bill Details</h4>
+        <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
+          <span>Item Total</span>
+          <span id="cart-item-total">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
+          <span>Delivery Fee</span>
+          <div><span style="text-decoration: line-through; margin-right: 6px; font-size: 0.8rem;">₹40</span><span style="color: green; font-weight: 600;">FREE</span></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
+          <span>Platform Fee</span>
+          <span>₹5</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
+          <span>GST / Taxes</span>
+          <span>Included</span>
+        </div>
+        <div style="height: 1px; background: rgba(0,0,0,0.1); margin: 4px 0;"></div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; color: var(--text-main);">
+          <span>To Pay</span>
+          <span id="cart-subtotal">₹0</span>
+        </div>
       </div>
-      <button class="btn btn-primary" style="width:100%;" onclick="openCheckoutModal()">Proceed to Checkout</button>
+
+      <button class="btn btn-primary" onclick="openCheckout()" style="width:100%; padding:14px; font-size:1.1rem;">Proceed to Checkout</button>
     </div>
   </div>
 
@@ -170,8 +193,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="reviews.js?v=3"></script>
-  <script src="script.js?v=3"></script>
+  <script src="reviews.js?v=4"></script>
+  <script src="script.js?v=4"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
