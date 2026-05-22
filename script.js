@@ -523,10 +523,10 @@ const renderHomeView = (container) => {
     <div class="app-top-header">
       <div class="top-bar">
         <div class="location-selector">
-          <span style="font-size:1.2rem;">📍</span>
+          <span style="font-size:1.2rem;">🚚</span>
           <div>
-            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Delivery in 10 mins</div>
-            <div style="font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:4px;">Home - Mumbai <svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg></div>
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Cash On Delivery Available</div>
+            <div style="font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:4px;">All India Delivery <svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg></div>
           </div>
         </div>
         <div class="profile-icon">
