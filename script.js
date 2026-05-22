@@ -217,14 +217,13 @@ const router = () => {
   appRoot.innerHTML = "";
 
   if (hash === "#admin") {
-    document.body.classList.add("admin-mode");
-    const isAuthenticated = sessionStorage.getItem("ud_admin_auth") === "true";
-    if (isAuthenticated) {
-      renderAdminDashboard(appRoot);
-    } else {
-      renderAdminLogin(appRoot);
-    }
-  } else if (hash.startsWith("#product/")) {
+  if (hash === 'tracker') {
+    window.renderTrackerView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === 'admin') {
+    window.renderAdminView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash.startsWith("product/")) {
     const productId = hash.split("/")[1];
     renderProductDetails(appRoot, productId);
     window.scrollTo(0, 0);
@@ -233,12 +232,10 @@ const router = () => {
     renderHomeView(appRoot);
     
     // Smooth scroll to segment if targeted
-    if (hash && hash !== "#home") {
-      const element = document.getElementById(hash.substring(1));
+    if (hash && hash !== "home") {
+      const element = document.getElementById(hash);
       if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
       window.scrollTo(0, 0);
@@ -529,9 +526,9 @@ const renderHomeView = (container) => {
             <div style="font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:4px;">All India Delivery <svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg></div>
           </div>
         </div>
-        <div class="profile-icon">
+        <a href="#tracker" class="profile-icon" title="Track Order" style="text-decoration:none;">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--primary)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </div>
+        </a>
       </div>
 
       <div class="search-container">
@@ -569,6 +566,30 @@ const renderHomeView = (container) => {
       <div class="promo-content">
         <h2>Get 100% Original Unani Formulations</h2>
         <p style="margin-top:4px; font-weight:600; color:var(--primary); background:rgba(255,255,255,0.8); display:inline-block; padding:2px 6px; border-radius:4px;">Delivered in Days!</p>
+      </div>
+    </div>
+
+    <!-- Fake Reviews Section -->
+    <div style="padding: 0 1rem; margin-bottom: 16px;">
+      <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; color:var(--primary); font-weight:700; margin-bottom:10px;">What Our Customers Say ❤️</h3>
+      <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; -webkit-overflow-scrolling:touch;">
+        
+        <div style="min-width:240px; background:#fff; padding:12px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #f0f0f0;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.9rem;">Rahul K.</span>
+            <span style="color:#ffb400; font-size:0.8rem;">⭐⭐⭐⭐⭐</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">"Best herbal products! I ordered Majun and the delivery was super fast. Highly recommended."</p>
+        </div>
+
+        <div style="min-width:240px; background:#fff; padding:12px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #f0f0f0;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="font-weight:700; font-size:0.9rem;">Ayesha S.</span>
+            <span style="color:#ffb400; font-size:0.8rem;">⭐⭐⭐⭐⭐</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">"Original Unani formulations. Very effective and authentic. Customer support is also great."</p>
+        </div>
+
       </div>
     </div>
 
@@ -1813,3 +1834,93 @@ if (aiChatBtn && aiChatPanel) {
     }
   });
 }
+
+// ==========================================================================
+// DELIVERY TRACKER (MOCK DATA in LOCAL STORAGE)
+// ==========================================================================
+const getOrders = () => JSON.parse(localStorage.getItem("dawakhana_orders") || "[]");
+const saveOrders = (orders) => localStorage.setItem("dawakhana_orders", JSON.stringify(orders));
+
+window.renderTrackerView = (container) => {
+  container.innerHTML = `
+    <div style="padding:1.5rem 1rem; text-align:center;">
+      <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:1rem;">Track Your Order ??</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Enter your mobile number to check delivery status.</p>
+      <input type="text" id="track-phone" placeholder="Mobile Number (e.g. 9876543210)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:1rem; font-size:1rem;">
+      <button class="btn-primary" onclick="checkOrderStatus()" style="width:100%; padding:12px;">Track Status</button>
+      <div id="track-result" style="margin-top:2rem; text-align:left;"></div>
+    </div>
+  `;
+};
+
+window.checkOrderStatus = () => {
+  const phone = document.getElementById("track-phone").value.trim();
+  const res = document.getElementById("track-result");
+  if(!phone) {
+    res.innerHTML = "<p style=\"color:red; text-align:center;\">Please enter a valid mobile number.</p>";
+    return;
+  }
+  const orders = getOrders();
+  const userOrders = orders.filter(o => o.phone === phone);
+  
+  if(userOrders.length === 0) {
+    res.innerHTML = `
+      <div style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); text-align:center;">
+        <span style="font-size:2rem;">??</span>
+        <h3 style="margin-top:10px; color:var(--primary);">No Orders Found</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">We couldn't find any orders linked to this number.</p>
+      </div>`;
+  } else {
+    res.innerHTML = userOrders.map(o => `
+      <div style="background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:1rem; border-left:4px solid #25D366;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-weight:bold; font-size:0.9rem;">Order: ${o.item}</span>
+          <span style="background:#e6f4ea; color:#0d652d; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${o.status}</span>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Updated: ${o.date}</p>
+        <p style="font-size:0.85rem;"><strong>Tracking Note:</strong> ${o.note || "Will be delivered soon."}</p>
+      </div>
+    `).join("");
+  }
+};
+
+window.renderAdminView = (container) => {
+  container.innerHTML = `
+    <div style="padding:1.5rem 1rem;">
+      <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:1rem;">Admin Tracker Panel</h2>
+      <div style="background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+        <h3 style="font-size:1rem; margin-bottom:10px;">Add / Update Order</h3>
+        <input type="text" id="admin-phone" placeholder="Customer Mobile" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
+        <input type="text" id="admin-item" placeholder="Item Name" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
+        <select id="admin-status" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
+          <option value="Processing">Processing</option>
+          <option value="Dispatched">Dispatched</option>
+          <option value="In Transit">In Transit</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+        <input type="text" id="admin-note" placeholder="Tracking Link / Note" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
+        <button class="btn-primary" onclick="adminSaveOrder()" style="width:100%; padding:12px;">Save Order Status</button>
+      </div>
+    </div>
+  `;
+};
+
+window.adminSaveOrder = () => {
+  const phone = document.getElementById("admin-phone").value.trim();
+  const item = document.getElementById("admin-item").value.trim();
+  const status = document.getElementById("admin-status").value;
+  const note = document.getElementById("admin-note").value.trim();
+  
+  if(!phone || !item) return alert("Phone and Item required!");
+  
+  const orders = getOrders();
+  orders.push({
+    phone, item, status, note, date: new Date().toLocaleDateString()
+  });
+  saveOrders(orders);
+  alert("Order Status Updated!");
+  document.getElementById("admin-phone").value = "";
+  document.getElementById("admin-item").value = "";
+  document.getElementById("admin-note").value = "";
+};
+
