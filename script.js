@@ -171,16 +171,10 @@ const renderAdminLogin = (container) => {
     const passcode = document.getElementById("admin-passcode").value;
     
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: 'admin', password: passcode })
-      });
-      const data = await res.json();
-      
-      if (data.success) {
+      // Mock Client-Side Auth for Vercel Static deployment
+      if (passcode === "7860" || passcode === "123456") {
         sessionStorage.setItem("ud_admin_auth", "true");
-        sessionStorage.setItem("ud_admin_token", data.token);
+        sessionStorage.setItem("ud_admin_token", "mock-secure-token-8923");
         errorMsg.style.display = "none";
         router(); // Re-trigger routing
       } else {
