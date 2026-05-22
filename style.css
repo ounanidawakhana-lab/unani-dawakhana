@@ -186,7 +186,7 @@ header.sticky-header {position:sticky;top:0;z-index:10;background:var(--glass-bg
   100% { transform: scale(1.1); }
 }
 
-.floating-whatsapp-btn {
+.floating-whatsapp-btn { display: none !important;
   position: fixed;
   right: 1.5rem;
   bottom: 2rem;
@@ -493,3 +493,100 @@ header.sticky-header {position:sticky;top:0;z-index:10;background:var(--glass-bg
 .floating-whatsapp-btn {
   bottom: 80px; /* Sit above bottom nav */
 }
+
+/* Checkout Modal Styles */
+.checkout-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 2000;
+  align-items: flex-end;
+  justify-content: center;
+}
+.checkout-modal-overlay.open {
+  display: flex;
+}
+.checkout-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  animation: slideUp 0.3s ease forwards;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+.checkout-close {
+  background: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+}
+#checkout-form .form-group {
+  margin-bottom: 1rem;
+}
+#checkout-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.3rem;
+}
+#checkout-form input, #checkout-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+#checkout-form input:focus, #checkout-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(18,53,36,0.1);
+}
+.form-grid {
+  display: grid;
+  gap: 10px;
+}
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  font-weight: 600;
+  cursor: pointer;
+}
+.payment-option input {
+  width: auto;
+}
+
