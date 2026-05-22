@@ -1835,7 +1835,7 @@ const openCheckoutModal = () => {
     if (cartPaymentMode) {
       const checkoutRadios = document.getElementsByName('payment_mode');
       checkoutRadios.forEach(r => {
-        if (cartPaymentMode.value === 'Online' && r.value === 'WhatsApp') r.checked = true;
+        if (cartPaymentMode.value === 'Online' && r.value === 'Online') r.checked = true;
         if (cartPaymentMode.value === 'COD' && r.value === 'COD') r.checked = true;
       });
     }
@@ -2002,14 +2002,15 @@ const submitOrder = async (mode) => {
   updateCartBadge();
   closeCheckoutModal();
 
-  if (mode === "WhatsApp") {
+  if (mode === "Online") {
     // Generate Whatsapp order message
     const formattedMsg = encodeURIComponent(
       `Hello Unani Dawakhana Official,\n` +
       `I would like to confirm my order:\n\n` +
       `*Order ID:* ${orderId}\n` +
       `*Remedies:* ${orderItemsText}\n` +
-      `*Total Price:* ₹${orderTotal} (COD)\n\n` +
+      `*Total Price:* ₹${orderTotal} (Pay Online)\n\n` +
+      `*Payment Mode:* Pay Online (Please send QR Code/Payment Link)\n\n` +
       `*Shipping Details:*\n` +
       `- Name: ${name}\n` +
       `- Phone: ${phone}\n` +
@@ -2017,7 +2018,7 @@ const submitOrder = async (mode) => {
       `- City/Pincode: ${city} - ${pincode}`
     );
     window.open(`https://wa.me/918796982661?text=${formattedMsg}`, "_blank");
-    showSuccessPopup("Order Registered!", `Thank you, ${name}. Your order ${orderId} details have been sent via WhatsApp. We will contact you soon.`, orderId);
+    showSuccessPopup("Order Registered!", `Thank you, ${name}. Your order ${orderId} details have been sent via WhatsApp. Please complete your online payment there.`, orderId);
   } else {
     // COD Mode success popup
     showSuccessPopup("Order Registered!", `Thank you, ${name}. Your Cash on Delivery order ${orderId} has been successfully registered. We will deliver it to ${address} shortly.`, orderId);

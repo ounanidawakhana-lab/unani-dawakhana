@@ -46,7 +46,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=10">
+
+  <!-- Google Analytics Placeholder -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+
+  <!-- Meta Pixel Code Placeholder -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'META_PIXEL_ID');
+    fbq('track', 'PageView');
+  </script>
 </head>
 <body>
   <!-- Splash Screen -->
@@ -155,7 +178,7 @@
                 <input type="radio" name="payment_mode" value="COD" checked> Cash on Delivery (COD)
               </label>
               <label class="payment-option">
-                <input type="radio" name="payment_mode" value="WhatsApp"> Pay via WhatsApp Support
+                <input type="radio" name="payment_mode" value="Online"> Pay Online (UPI, Cards)
               </label>
             </div>
           </div>
@@ -209,8 +232,16 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="reviews.js?v=8"></script>
-  <script src="script.js?v=8"></script>
+  <script src="reviews.js?v=10"></script>
+  <script src="script.js?v=10"></script>
+    <footer style="margin-top:40px; margin-bottom: 70px; text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem; border-top:1px solid var(--border);">
+      <p style="margin-bottom: 10px;">&copy; 2026 Unani Dawakhana. 100% Genuine Herbal Formulations.</p>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
+        <a href="/privacy.html" style="color: var(--text-muted); text-decoration: none;">Privacy Policy</a>
+        <a href="/terms.html" style="color: var(--text-muted); text-decoration: none;">Terms & Conditions</a>
+        <a href="/refund.html" style="color: var(--text-muted); text-decoration: none;">Refund Policy</a>
+      </div>
+    </footer>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
