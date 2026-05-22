@@ -497,11 +497,13 @@ const renderCartItems = () => {
             <h4 class="cart-item-name">${item.name}</h4>
             <span class="cart-item-price">₹${item.price}</span>
           </div>
-          <div class="cart-item-qty">
-            <button class="qty-btn" onclick="updateCartQty('${item.id}', ${item.qty - 1})">-</button>
-            <span>${item.qty}</span>
-            <button class="qty-btn" onclick="updateCartQty('${item.id}', ${item.qty + 1})">+</button>
-            <button class="cart-item-remove" style="margin-left:auto;" onclick="updateCartQty('${item.id}', 0)">Remove</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 8px;">
+            <div class="cart-qty-controls">
+              <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', ${item.qty - 1})">-</button>
+              <span style="font-weight:700; min-width:16px; text-align:center;">${item.qty}</span>
+              <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', ${item.qty + 1})">+</button>
+            </div>
+            <button onclick="updateCartQty('${item.id}', 0)" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer; padding:4px;">🗑️</button>
           </div>
         </div>
       </div>
