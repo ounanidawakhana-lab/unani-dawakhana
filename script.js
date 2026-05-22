@@ -1410,6 +1410,53 @@ const renderCheckoutSummary = () => {
   if (totalText) totalText.innerText = `₹${total}`;
 };
 
+const btnCurrentLocation = document.getElementById("btn-current-location");
+if (btnCurrentLocation) {
+  btnCurrentLocation.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    const originalText = btnCurrentLocation.innerHTML;
+    btnCurrentLocation.innerHTML = "Fetching...";
+    btnCurrentLocation.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const data = await res.json();
+        
+        if (data && data.address) {
+          const addr = data.address;
+          const house = addr.house_number || addr.building || "";
+          const road = addr.road || addr.neighbourhood || "";
+          const suburb = addr.suburb || addr.residential || "";
+          
+          let fullAddress = [house, road, suburb].filter(Boolean).join(", ");
+          if(!fullAddress) fullAddress = data.display_name;
+
+          document.getElementById("chk-address").value = fullAddress;
+          document.getElementById("chk-city").value = addr.city || addr.town || addr.state_district || "";
+          document.getElementById("chk-pincode").value = addr.postcode || "";
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to auto-fill location. Please enter manually.");
+      } finally {
+        btnCurrentLocation.innerHTML = originalText;
+        btnCurrentLocation.disabled = false;
+      }
+    }, (error) => {
+      console.error(error);
+      alert("Please allow location access to auto-fill address.");
+      btnCurrentLocation.innerHTML = originalText;
+      btnCurrentLocation.disabled = false;
+    });
+  });
+}
+
 // Handle Checkout Form Submission (COD / WhatsApp)
 const checkoutForm = document.getElementById("checkout-form");
 if (checkoutForm) {
