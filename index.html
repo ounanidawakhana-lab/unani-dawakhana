@@ -79,8 +79,28 @@
     </div>
   </div>
 
-  <!-- Notification Toast -->
-  <div id="toast-notification" class="toast-notification"></div>
+  <!-- Bottom App Navigation -->
+  <nav class="app-bottom-nav">
+    <a href="#home" class="nav-btn active">
+      <div class="nav-icon">🏠</div>
+      <span>Home</span>
+    </a>
+    <a href="#categories" class="nav-btn" onclick="document.querySelector('.category-scroll').scrollIntoView({behavior: 'smooth'})">
+      <div class="nav-icon">🗂️</div>
+      <span>Categories</span>
+    </a>
+    <a href="#trending" class="nav-btn" onclick="setStoreCategory('Combo')">
+      <div class="nav-icon">📈</div>
+      <span>Trending</span>
+    </a>
+    <a href="#" class="nav-btn" onclick="openCartDrawer()">
+      <div class="nav-icon" style="position:relative;">
+        🛒
+        <span class="nav-badge" id="cart-badge-count" style="position:absolute; top:-6px; right:-8px; background:#e91e63; color:#fff; border-radius:50%; width:16px; height:16px; font-size:0.6rem; display:flex; align-items:center; justify-content:center; font-weight:bold;">0</span>
+      </div>
+      <span>Cart</span>
+    </a>
+  </nav>
 
   <!-- Sticky WhatsApp Button -->
   <a href="https://wa.me/918796982661?text=Hello%20Unani%20Dawakhana,%20I%20would%20like%20to%20know%20more%20about%20your%20products." class="floating-whatsapp-btn" target="_blank" aria-label="Chat on WhatsApp">

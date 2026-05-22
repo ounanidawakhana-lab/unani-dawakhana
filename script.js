@@ -519,11 +519,65 @@ const renderProductDetails = (container, productId) => {
 
 // B. General Home Page View
 const renderHomeView = (container) => {
-  // Render only the products grid on the home page
   container.innerHTML = `
-    <section class="section" id="products">
+    <div class="app-top-header">
+      <div class="top-bar">
+        <div class="location-selector">
+          <span style="font-size:1.2rem;">📍</span>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Delivery in 10 mins</div>
+            <div style="font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:4px;">Home - Mumbai <svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg></div>
+          </div>
+        </div>
+        <div class="profile-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--primary)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#666"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Search for 'Herbal Oils'..." oninput="handleShopSearch(this.value)" value="${storeSearchQuery}">
+        </div>
+      </div>
+
+      <div class="category-scroll">
+        <div class="cat-item ${storeActiveCategory === 'All' ? 'active' : ''}" onclick="setStoreCategory('All')">
+          <div class="cat-icon-box" style="background:#fef08a;">🌿</div>
+          <span>All</span>
+        </div>
+        <div class="cat-item ${storeActiveCategory === 'General Wellness' ? 'active' : ''}" onclick="setStoreCategory('General Wellness')">
+          <div class="cat-icon-box" style="background:#fed7aa;">💪</div>
+          <span>Wellness</span>
+        </div>
+        <div class="cat-item ${storeActiveCategory === 'Oils' ? 'active' : ''}" onclick="setStoreCategory('Oils')">
+          <div class="cat-icon-box" style="background:#bbf7d0;">💧</div>
+          <span>Oils</span>
+        </div>
+        <div class="cat-item ${storeActiveCategory === 'Powders' ? 'active' : ''}" onclick="setStoreCategory('Powders')">
+          <div class="cat-icon-box" style="background:#bfdbfe;">✨</div>
+          <span>Powders</span>
+        </div>
+        <div class="cat-item" onclick="setStoreCategory('Combo')">
+          <div class="cat-icon-box" style="background:#e9d5ff;">🎁</div>
+          <span>Combos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="promo-banner">
+      <div class="promo-content">
+        <h2>Get 100% Original Unani Formulations</h2>
+        <p style="margin-top:4px; font-weight:600; color:var(--primary); background:rgba(255,255,255,0.8); display:inline-block; padding:2px 6px; border-radius:4px;">Delivered in Days!</p>
+      </div>
+    </div>
+
+    <section class="section" id="products" style="padding-top: 10px; background: #fdfdfd;">
       <div class="container">
-        <h2 class="section-title">Our Herbal Formulations</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; padding: 0 4px;">
+          <h2 style="font-family:'Outfit',sans-serif; font-size:1.3rem; color:var(--primary); font-weight:700;">Premium Remedies</h2>
+          <span style="color:#e91e63; font-weight:600; font-size:0.9rem;">See All ></span>
+        </div>
         <div class="products-showcase-grid" id="products-grid-container"></div>
       </div>
     </section>
@@ -557,28 +611,23 @@ const renderProductsGrid = () => {
   }
 
   container.innerHTML = filtered.map(p => `
-    <div class="product-card fade-in">
+    <div class="product-card fade-in" onclick="window.location.hash='#product/${p.id}'" style="cursor:pointer;">
       <div class="product-img-box">
         <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
-        <span class="badge discount">-20%</span>
+        <span class="badge discount" style="position:absolute; top:8px; left:8px; background:#e91e63; font-size:0.65rem; padding:3px 6px;">15% OFF</span>
+        <button class="quick-add-btn" onclick="event.stopPropagation(); addToCart('${p.id}', 1)">+</button>
       </div>
       <div class="product-info">
-        <span class="product-category" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block;">${p.category}</span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <span class="product-price">₹${p.price} <span style="font-size:0.7rem; color:var(--text-muted); text-decoration:line-through; font-weight:400;">₹${p.originalPrice}</span></span>
+        </div>
         <h3 class="product-title">${p.name}</h3>
-        <div class="rating">★★★★☆ <span class="review-count">(120 reviews)</span></div>
-        <p class="product-desc">${p.description}</p>
-        <div class="product-footer">
-          <span class="product-price">₹${p.price}</span>
-          <div class="product-actions" style="flex-direction: column; gap: 8px;">
-            <div style="display: flex; gap: 8px; width: 100%;">
-              <a href="#product/${p.id}" class="btn-outline" title="View Details">👁 Details</a>
-              <button class="btn-primary" onclick="addToCart('${p.id}', 1)" title="Add to Cart">🛒 Add</button>
-            </div>
-            <a href="https://wa.me/918796982661?text=Hello%20Unani%20Dawakhana,%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20at%20%E2%82%B9${p.price}." target="_blank" class="btn-whatsapp" title="Order via WhatsApp" style="text-decoration: none; width: 100%;">
-              <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-              Order via WhatsApp
-            </a>
-          </div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">1 pack</p>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#fef08a; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700; color:#b45309;">Trending</div>
+          <a href="https://wa.me/918796982661?text=Hello%20Unani%20Dawakhana,%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20at%20%E2%82%B9${p.price}." onclick="event.stopPropagation();" target="_blank" style="color:#25D366; background:#dcf8c6; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:4px;">
+            <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg> Order
+          </a>
         </div>
       </div>
     </div>
