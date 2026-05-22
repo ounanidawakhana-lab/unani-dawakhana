@@ -904,13 +904,16 @@ const renderProductsGrid = () => {
 
   container.innerHTML = filtered.map(p => `
     <div class="product-card fade-in">
-      <div class="product-img-box">
+      <div class="product-img-box" style="position:relative;">
         <img class="product-img" src="${p.image}" alt="${p.name}">
+        <span class="badge discount">-20%</span>
       </div>
       <div class="product-info">
         <span class="product-category" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block;">${p.category}</span>
         <h3 class="product-title">${p.name}</h3>
+        <div class="rating">★★★★☆ <span class="review-count">(120 reviews)</span></div>
         <p class="product-desc">${p.description}</p>
+        <span class="badge bestseller">Bestseller</span>
         <div class="product-footer">
           <span class="product-price">₹${p.price}</span>
           <div class="product-actions">
