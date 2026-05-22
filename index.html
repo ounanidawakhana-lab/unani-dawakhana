@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <!-- Splash Screen -->
@@ -86,8 +86,11 @@
           <span>Included</span>
         </div>
         <div style="height: 1px; background: rgba(0,0,0,0.1); margin: 4px 0;"></div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; color: var(--text-main);">
-          <span>To Pay</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:1.1rem; color: var(--text-main);">
+          <div style="display:flex; flex-direction:column;">
+            <span>To Pay</span>
+            <span style="font-size: 0.75rem; color: var(--primary); font-weight: 600;">Cash on Delivery</span>
+          </div>
           <span id="cart-subtotal">₹0</span>
         </div>
       </div>
@@ -193,8 +196,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="reviews.js?v=5"></script>
-  <script src="script.js?v=5"></script>
+  <script src="reviews.js?v=6"></script>
+  <script src="script.js?v=6"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
