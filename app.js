@@ -1418,39 +1418,22 @@ const submitOrder = (mode) => {
   });
   saveProductsState();
 
-  // Save order to backend
-  fetch('/api/orders', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      customerName: name,
-      customerPhone: phone,
-      address,
-      city,
-      pincode,
-      paymentMethod: mode === "WhatsApp" ? "WhatsApp" : "COD",
-      totalAmount: orderTotal,
-      items: cart
-    })
-  }).then(res => res.json()).then(data => {
-    if(data.success) {
-      const newOrder = {
-        id: `ORD-${data.id}`,
-        date: new Date().toISOString().split("T")[0],
-        name: name,
-        phone: phone,
-        address: address,
-        city: city,
-        pincode: pincode,
-        productName: orderItemsText,
-        total: orderTotal,
-        status: "New Order",
-        paymentStatus: "Pending"
-      };
-      orders.push(newOrder);
-      saveOrdersState();
-    }
-  }).catch(err => console.error(err));
+  // Save order to local state (Mock Backend)
+  const newOrder = {
+    id: `ORD-${Date.now()}`,
+    date: new Date().toISOString().split("T")[0],
+    name: name,
+    phone: phone,
+    address: address,
+    city: city,
+    pincode: pincode,
+    productName: orderItemsText,
+    total: orderTotal,
+    status: "New Order",
+    paymentStatus: "Pending"
+  };
+  orders.push(newOrder);
+  saveOrdersState();
 
   // Clear cart
   cart = [];
