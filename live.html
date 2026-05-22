@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unani Dawakhana Official | Luxury Herbal Wellness & Clinic</title>
+  <meta name="description" content="Welcome to Unani Dawakhana Official in Shaheen Bagh, New Delhi. Discover professional Unani treatments and luxury organic herbal formulations for holistic health, stomach care, joint pain, and hair care.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <span class="announcement-text">🌿 Unani Dawakhana Official | Free Medical Helpline: +91 8796982661 📞</span>
+  </div>
+
+  <!-- Main Header Navigation -->
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Logo -->
+      <a href="#home" class="logo-link" id="nav-logo">
+        <div class="logo-wrapper">
+          <span class="logo-icon">🌿</span>
+          <div class="logo-text">
+            <span class="logo-title">UNANI DAWAKHANA</span>
+            <span class="logo-subtitle">OFFICIAL</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Navigation -->
+      <nav class="nav-menu" id="nav-menu">
+        <a href="#home" class="nav-link active" data-view="home">Home</a>
+        <a href="#about" class="nav-link" data-view="about">About Clinic</a>
+        <a href="#treatments" class="nav-link" data-view="treatments">Treatments</a>
+        <a href="#products" class="nav-link" data-view="products">Herbal Shop</a>
+        <a href="#appointment" class="nav-link" data-view="appointment">Book Appointment</a>
+        <a href="#contact" class="nav-link" data-view="contact">Contact</a>
+        <a href="#admin" class="nav-link admin-portal-link" data-view="admin" style="color: var(--accent); font-weight: 600;">🔒 Owner Portal</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <!-- Dark Mode Toggle -->
+        <button class="action-btn" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+
+        <!-- Cart Button -->
+        <button class="action-btn cart-btn" id="cart-trigger" aria-label="Open Cart">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21a1 1 0 1 0 0 2 1 1 0 1 0 0-2z"></path><path d="M20 21a1 1 0 1 0 0 2 1 1 0 1 0 0-2z"></path><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          <span class="cart-badge" id="cart-badge-count">0</span>
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="action-btn mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle menu">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobile-drawer">
+    <div class="drawer-overlay" id="mobile-drawer-overlay"></div>
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Menu</h3>
+        <button class="close-btn" id="mobile-drawer-close">&times;</button>
+      </div>
+      <div class="mobile-links">
+        <a href="#home" class="mobile-link active" data-view="home">Home</a>
+        <a href="#about" class="mobile-link" data-view="about">About Clinic</a>
+        <a href="#treatments" class="mobile-link" data-view="treatments">Treatments</a>
+        <a href="#products" class="mobile-link" data-view="products">Herbal Shop</a>
+        <a href="#appointment" class="mobile-link" data-view="appointment">Book Appointment</a>
+        <a href="#contact" class="mobile-link" data-view="contact">Contact</a>
+        <a href="#admin" class="mobile-link" data-view="admin" style="color: var(--accent);">🔒 Owner Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Slide-out Drawer -->
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-overlay" id="cart-overlay-close"></div>
+    <div class="cart-drawer-content">
+      <div class="cart-header">
+        <h2>Shopping Cart (<span id="cart-drawer-count">0</span>)</h2>
+        <button class="close-btn" id="cart-drawer-close">&times;</button>
+      </div>
+      
+      <!-- Cart Items Container -->
+      <div class="cart-items" id="cart-items-container">
+        <div class="empty-cart-message">
+          <p>Your shopping cart is empty.</p>
+          <a href="#products" class="btn btn-primary" id="empty-cart-shop-btn">Browse Shop</a>
+        </div>
+      </div>
+
+      <!-- Cart Footer -->
+      <div class="cart-footer" id="cart-footer-details">
+        <div class="price-row">
+          <span>Subtotal</span>
+          <span class="subtotal-price" id="cart-subtotal">₹0.00</span>
+        </div>
+        <p class="shipping-info-text">Free Shipping & Cash on Delivery across India.</p>
+        
+        <div class="cart-actions">
+          <button class="btn btn-secondary btn-full" id="checkout-whatsapp-direct">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            Order via WhatsApp
+          </button>
+          <button class="btn btn-primary btn-full" id="checkout-normal-btn">Proceed to Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Information Modal -->
+  <div class="checkout-modal" id="checkout-modal">
+    <div class="checkout-modal-bg" id="checkout-modal-close"></div>
+    <div class="checkout-container">
+      <div class="checkout-header">
+        <h2>Delivery Address Details</h2>
+        <button class="close-btn" id="close-checkout-modal-btn">&times;</button>
+      </div>
+      
+      <form id="shipping-form" class="shipping-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="checkout-name">Full Name *</label>
+            <input type="text" id="checkout-name" required placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label for="checkout-phone">WhatsApp/Phone Number *</label>
+            <input type="tel" id="checkout-phone" required placeholder="10-digit mobile number">
+          </div>
+          <div class="form-group col-span-2">
+            <label for="checkout-address">Complete Shipping Address *</label>
+            <input type="text" id="checkout-address" required placeholder="House No, Street, Landmark">
+          </div>
+          <div class="form-group">
+            <label for="checkout-city">City *</label>
+            <input type="text" id="checkout-city" required placeholder="City">
+          </div>
+          <div class="form-group">
+            <label for="checkout-pincode">PIN Code *</label>
+            <input type="text" id="checkout-pincode" pattern="[0-9]{6}" required placeholder="6-digit pincode">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Payment Mode</label>
+            <div class="payment-method-selector">
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="COD" checked>
+                <span class="payment-label-text">
+                  <strong>Cash on Delivery (COD)</strong>
+                  <small>Pay at delivery time (Free Home Delivery)</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-summary-box">
+          <h3>Order Details</h3>
+          <div id="checkout-summary-items">
+            <!-- Dynamic Items -->
+          </div>
+          <div class="summary-total-row">
+            <span>Total Payable:</span>
+            <strong id="checkout-summary-total">₹0.00</strong>
+          </div>
+        </div>
+
+        <div class="checkout-submit-buttons">
+          <button type="submit" class="btn btn-primary" id="btn-submit-cod">Confirm COD Order</button>
+          <button type="button" class="btn btn-whatsapp" id="btn-submit-whatsapp">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            Order via WhatsApp
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Notification Screen -->
+  <div class="success-popup" id="success-popup">
+    <div class="success-card">
+      <div class="success-icon">✓</div>
+      <h2 id="success-popup-title">Action Successful!</h2>
+      <p id="success-message">Details registered successfully.</p>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 100%;">
+        <button class="btn btn-secondary btn-full" id="success-download-btn" style="display: none;">📄 Print / Save Receipt</button>
+        <button class="btn btn-primary btn-full" id="success-close-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Invoice Modal -->
+  <div class="checkout-modal" id="admin-invoice-modal">
+    <div class="checkout-modal-bg" id="admin-invoice-modal-close-bg"></div>
+    <div class="checkout-container" style="max-width: 700px;">
+      <div class="checkout-header no-print">
+        <h2>📄 Clinical Order Invoice</h2>
+        <button class="close-btn" id="close-invoice-modal-btn">&times;</button>
+      </div>
+      <div id="invoice-modal-content">
+        <!-- Rendered dynamically via JS -->
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;" class="no-print">
+        <button class="btn btn-secondary" id="print-invoice-btn">🖨️ Print / Save PDF</button>
+        <button class="btn btn-primary" id="close-invoice-modal-btn-bottom">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating WhatsApp Helpline Button -->
+  <a href="https://wa.me/918796982661" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- Floating AI Hakeem Button -->
+  <button class="ai-chat-btn" id="ai-chat-btn" aria-label="Chat with AI Hakeem">
+    🤖 AI Hakeem
+  </button>
+
+  <!-- AI Chat Panel -->
+  <div class="ai-chat-panel" id="ai-chat-panel">
+    <div class="ai-chat-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size: 1.5rem;">🤖</span>
+        <div>
+          <h3 style="margin:0; font-size:1.1rem; color:white;">AI Hakeem</h3>
+          <small style="color:#e0e0e0;">Unani Medical Assistant</small>
+        </div>
+      </div>
+      <button class="close-btn" id="ai-chat-close" style="color:white; font-size:1.5rem;">&times;</button>
+    </div>
+    
+    <div class="ai-chat-body" id="ai-chat-body">
+      <div class="ai-msg bot">
+        Assalamu Alaikum! Main AI Hakeem hoon. Aapko kya takleef hai ya kis beemari ka ilaj chahte hain? Main aapko natural Unani dawaiyan aur gharelu nuskhe bata sakta hoon.
+      </div>
+    </div>
+    
+    <form class="ai-chat-input-area" id="ai-chat-form">
+      <input type="text" id="ai-chat-input" placeholder="Apni beemari likhein..." required>
+      <button type="submit" class="ai-send-btn" aria-label="Send">➤</button>
+    </form>
+  </div>
+
+  <!-- Sticky Mobile Action bar -->
+  <div class="mobile-action-bar">
+    <a href="https://wa.me/918796982661" target="_blank" class="mobile-bar-btn consult-btn">
+      💬 WhatsApp Doctor
+    </a>
+    <a href="#appointment" class="mobile-bar-btn buy-btn">
+      📅 Book Appointment
+    </a>
+  </div>
+
+  <!-- Main Render Root -->
+  <main id="app-root" class="fade-in">
+    <!-- Rendered dynamically via hash routing (Home/Details/Admin) -->
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col brand-col">
+        <div class="footer-logo">🌿 UNANI DAWAKHANA OFFICIAL</div>
+        <p class="brand-bio">A clinical herbal wellness center offering premier Ayurvedic and Unani natural medical consultations, targeted chronic therapies, and organic botanical remedies.</p>
+        <div class="certification-badges">
+          <span class="badge">AYUSH Certified</span>
+          <span class="badge">GMP Standard</span>
+          <span class="badge">100% Herbal</span>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About Clinic</a></li>
+          <li><a href="#treatments">Treatments</a></li>
+          <li><a href="#products">Herbal Shop</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Treatments</h4>
+        <ul class="footer-links">
+          <li><a href="#treatments">Stomach Care</a></li>
+          <li><a href="#treatments">Joint Pain Relief</a></li>
+          <li><a href="#treatments">Skin Disorders</a></li>
+          <li><a href="#treatments">Hijama Detoxification</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col contact-col">
+        <h4>Contact Clinic</h4>
+        <p class="consultation-offer">Shaheen Bagh, Okhla, New Delhi - 110025</p>
+        <p class="consultation-offer" style="margin-top: -10px;">Email: ounanidawakhana@gmail.com</p>
+        <a href="https://wa.me/918796982661" target="_blank" class="footer-whatsapp-btn">
+          💬 Support: 8796982661
+        </a>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-container">
+        <p>&copy; 2026 Unani Dawakhana Official. All Rights Reserved. Clean Modern Wellness.</p>
+        <div class="policy-links">
+          <a href="#privacy">Privacy</a>
+          <a href="#terms">Terms</a>
+          <a href="#admin" style="color: var(--accent);">🔒 Admin Portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Logic Javascript -->
+  <script src="app.js"></script>
+</body>
+</html>
