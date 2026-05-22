@@ -1395,92 +1395,21 @@ const renderCheckoutSummary = () => {
 };
 
 // Handle Checkout Form Submission (COD / WhatsApp)
-const shippingForm = document.getElementById("shipping-form");
-if (shippingForm) {
-  // COD Standard submission
-  shippingForm.addEventListener("submit", (e) => {
+const checkoutForm = document.getElementById("checkout-form");
+if (checkoutForm) {
+  checkoutForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    submitOrder("COD");
-  });
-
-  // Direct WhatsApp shipping confirmation
-  const btnWa = document.getElementById("btn-submit-whatsapp");
-  if (btnWa) {
-    btnWa.addEventListener("click", () => {
-      // Trigger validation check manually before sending
-      if (shippingForm.checkValidity()) {
-        submitOrder("WhatsApp");
-      } else {
-        shippingForm.reportValidity();
-      }
-    });
-  }
-
-  // Pincode auto-fill address handler
-  const pinInput = document.getElementById("checkout-pincode");
-  const cityInput = document.getElementById("checkout-city");
-
-  if (pinInput && cityInput) {
-    pinInput.addEventListener("input", async (e) => {
-      const pin = e.target.value.trim();
-      // Indian pincodes are exactly 6 digits
-      if (/^\d{6}$/.test(pin)) {
-        const originalPlaceholder = cityInput.placeholder;
-        cityInput.placeholder = "Auto-fetching City/State...";
-        cityInput.value = "";
-        cityInput.disabled = true;
-
-        try {
-          const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
-          if (res.ok) {
-            const data = await res.ok ? await res.json() : null;
-            if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice) {
-              const office = data[0].PostOffice[0];
-              const district = office.District;
-              const state = office.State;
-              cityInput.value = `${district}, ${state}`;
-            }
-          }
-        } catch (err) {
-          console.error("Error auto-filling pincode data:", err);
-        } finally {
-          cityInput.disabled = false;
-          cityInput.placeholder = originalPlaceholder;
-        }
-      }
-    });
-  }
-}
-
-// Direct WhatsApp order from Cart Drawer
-const directCartWa = document.getElementById("checkout-whatsapp-direct");
-if (directCartWa) {
-  directCartWa.addEventListener("click", () => {
-    if (cart.length === 0) return;
-    
-    // Generate text message based on cart
-    const cartText = cart.map(item => `- ${item.name} (x${item.qty})`).join("\n");
-    const cartSubtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    
-    const textMsg = encodeURIComponent(
-      `Hello Unani Dawakhana Official, I would like to order:\n\n` +
-      `${cartText}\n\n` +
-      `Subtotal: ₹${cartSubtotal}\n` +
-      `Delivery Mode: Cash on Delivery (COD)\n\n` +
-      `Please confirm my shipping address details.`
-    );
-    
-    // Open WA
-    window.open(`https://wa.me/918796982661?text=${textMsg}`, "_blank");
+    const paymentMode = document.querySelector('input[name="payment_mode"]:checked').value;
+    submitOrder(paymentMode);
   });
 }
 
 const submitOrder = (mode) => {
-  const name = document.getElementById("checkout-name").value;
-  const phone = document.getElementById("checkout-phone").value;
-  const address = document.getElementById("checkout-address").value;
-  const city = document.getElementById("checkout-city").value;
-  const pincode = document.getElementById("checkout-pincode").value;
+  const name = document.getElementById("chk-name").value;
+  const phone = document.getElementById("chk-phone").value;
+  const address = document.getElementById("chk-address").value;
+  const city = document.getElementById("chk-city").value;
+  const pincode = document.getElementById("chk-pincode").value;
 
   if (!/^\d{10}$/.test(phone.trim())) {
     alert("Please enter a valid 10-digit phone number.");
@@ -1518,6 +1447,17 @@ const submitOrder = (mode) => {
   orders.push(newOrder);
   saveOrdersState();
 
+  // Add to Delivery Tracker
+  const trackOrders = getOrders();
+  trackOrders.push({
+    phone: phone,
+    item: orderItemsText,
+    status: "Processing",
+    note: mode === "COD" ? "Cash on Delivery Order Placed" : "WhatsApp Order Placed",
+    date: new Date().toLocaleDateString()
+  });
+  saveOrders(trackOrders);
+
   // Clear cart
   cart = [];
   saveCartState();
@@ -1543,6 +1483,10 @@ const submitOrder = (mode) => {
   } else {
     // COD Mode success popup
     showSuccessPopup("Order Registered!", `Thank you, ${name}. Your Cash on Delivery order ${orderId} has been successfully registered. We will deliver it to ${address} shortly.`, orderId);
+    // Redirect to tracker after a short delay so they can see the popup
+    setTimeout(() => {
+      window.location.hash = "tracker";
+    }, 2000);
   }
 };
 
@@ -1930,5 +1874,16 @@ window.adminSaveOrder = () => {
   document.getElementById("admin-phone").value = "";
   document.getElementById("admin-item").value = "";
   document.getElementById("admin-note").value = "";
+};
+
+
+// Override COD Submit Order
+const origSubmitOrder = submitOrder;
+window.submitOrder = (mode) => {
+  origSubmitOrder(mode);
+  if (mode === "COD") {
+    alert("Order Placed Successfully!\n\nYour order has been recorded. We will deliver it soon.");
+    window.location.hash = "tracker";
+  }
 };
 
