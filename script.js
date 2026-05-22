@@ -19,7 +19,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     },
     {
       id: "qasmi-unani-hair-oil",
@@ -31,7 +33,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     },
     {
       id: "badshahi-nuksa",
@@ -43,7 +47,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     },
     {
       id: "ling-ka-tel",
@@ -55,7 +61,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     },
     {
       id: "badshahi-safuf",
@@ -67,7 +75,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     },
     {
       id: "badshahi-safuf-ling-ka-tel-combo-ayurvedic-men-wellness-pack",
@@ -79,7 +89,9 @@ const DEFAULT_PRODUCTS = [
       stock: 50,
       sold: Math.floor(Math.random() * 50) + 10,
       category: "General Wellness",
-      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."],
+      gstPercent: 0,
+      extraCharge: 40
     }
   ];
 
@@ -408,7 +420,9 @@ const addToCart = (productId, qty = 1) => {
       name: product.name,
       price: product.price,
       image: product.image,
-      qty: qty
+      qty: qty,
+      gstPercent: product.gstPercent || 0,
+      extraCharge: product.extraCharge || 0
     });
   }
 
@@ -487,8 +501,22 @@ const renderCartItems = () => {
   if (footerDetails) footerDetails.style.display = "flex";
   
   let subtotal = 0;
+  let totalGst = 0;
+  let totalExtraCharges = 0;
+
   container.innerHTML = cart.map(item => {
-    subtotal += item.price * item.qty;
+    const itemTotal = item.price * item.qty;
+    subtotal += itemTotal;
+
+    // GST calculation per product
+    const gstPct = item.gstPercent || 0;
+    const gstAmt = Math.round((itemTotal * gstPct) / 100);
+    totalGst += gstAmt;
+
+    // Extra charge is per unique product (not per qty) — fixed shipping per product
+    const extraCharge = item.extraCharge || 0;
+    totalExtraCharges += extraCharge;
+
     return `
       <div class="cart-item">
         <img class="cart-item-img" src="${item.image}" alt="${item.name}">
@@ -517,13 +545,25 @@ const renderCartItems = () => {
     `;
   }).join("");
 
-  const platformFee = 5;
-  const toPay = subtotal + platformFee;
-  
+  const toPay = subtotal + totalGst + totalExtraCharges;
+
   if (subtotalText) subtotalText.innerText = `₹${toPay}`;
-  const itemTotalText = document.getElementById("cart-item-total");
-  if (itemTotalText) itemTotalText.innerText = `₹${subtotal}`;
+  const itemTotalEl = document.getElementById("cart-item-total");
+  if (itemTotalEl) itemTotalEl.innerText = `₹${subtotal}`;
+
+  const deliveryEl = document.getElementById("cart-delivery-fee");
+  if (deliveryEl) {
+    if (totalExtraCharges === 0) {
+      deliveryEl.innerHTML = `<span style="color:green; font-weight:700;">FREE</span>`;
+    } else {
+      deliveryEl.innerText = `₹${totalExtraCharges}`;
+    }
+  }
+
+  const gstEl = document.getElementById("cart-gst");
+  if (gstEl) gstEl.innerText = totalGst > 0 ? `₹${totalGst}` : "Included";
 };
+
 
 // Make updateCartQty global so inline onclick works
 window.updateCartQty = updateCartQty;
@@ -1446,6 +1486,14 @@ const renderAdminTabContent = async () => {
                   <label for="crud-stock">Stock Quantity *</label>
                   <input type="number" id="crud-stock" required placeholder="15">
                 </div>
+                <div class="form-group">
+                  <label for="crud-gst">GST Percentage (%) *</label>
+                  <input type="number" id="crud-gst" required placeholder="E.g. 0, 5, 12" min="0" value="0">
+                </div>
+                <div class="form-group">
+                  <label for="crud-charges">Extra Charges (Delivery) ₹ *</label>
+                  <input type="number" id="crud-charges" required placeholder="E.g. 40" min="0" value="40">
+                </div>
                 <div class="form-group col-span-2">
                   <label for="crud-image">Product Photo (Upload Image) *</label>
                   <input type="file" id="crud-image" accept="image/*" onchange="handleImageUpload(event)">
@@ -1686,6 +1734,8 @@ const loadEditForm = (productId) => {
   document.getElementById("crud-orig-price").value = product.originalPrice;
   document.getElementById("crud-desc").value = product.description;
   document.getElementById("crud-stock").value = product.stock;
+  document.getElementById("crud-gst").value = product.gstPercent || 0;
+  document.getElementById("crud-charges").value = product.extraCharge || 0;
   document.getElementById("crud-image").value = ""; // Clear file input
   
   document.getElementById("crud-image-b64").value = product.image;
@@ -1708,6 +1758,8 @@ const handleProductSave = async (e) => {
   const origPriceVal = parseFloat(document.getElementById("crud-orig-price").value);
   const descVal = document.getElementById("crud-desc").value;
   const stockVal = parseInt(document.getElementById("crud-stock").value);
+  const gstVal = parseFloat(document.getElementById("crud-gst").value) || 0;
+  const chargesVal = parseFloat(document.getElementById("crud-charges").value) || 0;
   
   // Use Base64 image if uploaded, otherwise use default
   const imgB64 = document.getElementById("crud-image-b64").value;
@@ -1738,6 +1790,8 @@ const handleProductSave = async (e) => {
     sold: 0,
     category: "General",
     highlights: highlightsVal,
+    gstPercent: gstVal,
+    extraCharge: chargesVal,
     rating: ratingVal,
     reviews: reviewsVal,
     badge: badgeVal || null
@@ -1958,7 +2012,10 @@ const submitOrder = async (mode) => {
   }
 
   const orderId = `ORD-${Date.now()}`;
-  const orderTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const orderSubtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const orderTotalGst = cart.reduce((acc, item) => acc + Math.round((item.price * item.qty * (item.gstPercent || 0)) / 100), 0);
+  const orderTotalCharges = cart.reduce((acc, item) => acc + (item.extraCharge || 0), 0);
+  const orderTotal = orderSubtotal + orderTotalGst + orderTotalCharges;
   const orderItemsText = cart.map(item => `${item.name} (x${item.qty})`).join(", ");
 
   // Adjust product stocks
@@ -2020,8 +2077,12 @@ const submitOrder = async (mode) => {
       `Hello Unani Dawakhana Official,\n` +
       `I would like to confirm my order:\n\n` +
       `*Order ID:* ${orderId}\n` +
-      `*Remedies:* ${orderItemsText}\n` +
-      `*Total Price:* ₹${orderTotal} (Pay Online)\n\n` +
+      `*Remedies:* ${orderItemsText}\n\n` +
+      `*Bill Summary:*\n` +
+      `- Item Total: ₹${orderSubtotal}\n` +
+      (orderTotalGst > 0 ? `- GST/Taxes: ₹${orderTotalGst}\n` : ``) +
+      (orderTotalCharges > 0 ? `- Delivery Charges: ₹${orderTotalCharges}\n` : `- Delivery: FREE\n`) +
+      `- *Grand Total: ₹${orderTotal}*\n\n` +
       `*Payment Mode:* Pay Online (Please send QR Code/Payment Link)\n\n` +
       `*Shipping Details:*\n` +
       `- Name: ${name}\n` +

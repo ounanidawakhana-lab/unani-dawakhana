@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
 
   <!-- Google Analytics Placeholder -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
@@ -98,15 +98,11 @@
         </div>
         <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
           <span>Delivery Fee</span>
-          <div><span style="text-decoration: line-through; margin-right: 6px; font-size: 0.8rem;">₹40</span><span style="color: green; font-weight: 600;">FREE</span></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
-          <span>Platform Fee</span>
-          <span>₹5</span>
+          <span id="cart-delivery-fee"><span style="color:green; font-weight:700;">FREE</span></span>
         </div>
         <div style="display:flex; justify-content:space-between; color: var(--text-muted);">
           <span>GST / Taxes</span>
-          <span>Included</span>
+          <span id="cart-gst">Included</span>
         </div>
         <div style="height: 1px; background: rgba(0,0,0,0.1); margin: 8px 0;"></div>
         
@@ -232,8 +228,8 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="reviews.js?v=12"></script>
-  <script src="script.js?v=12"></script>
+  <script src="reviews.js?v=13"></script>
+  <script src="script.js?v=13"></script>
     <footer style="margin-top:40px; margin-bottom: 70px; text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem; border-top:1px solid var(--border);">
       <p style="margin-bottom: 10px;">&copy; 2026 Unani Dawakhana. 100% Genuine Herbal Formulations.</p>
       <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
