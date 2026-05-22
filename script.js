@@ -216,7 +216,6 @@ const router = () => {
   const appRoot = document.getElementById("app-root");
   appRoot.innerHTML = "";
 
-  if (hash === "#admin") {
   if (hash === 'tracker') {
     window.renderTrackerView(appRoot);
     window.scrollTo(0, 0);
