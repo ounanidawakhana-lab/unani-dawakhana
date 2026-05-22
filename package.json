@@ -1,11 +1,10 @@
 {
-  "name": "unani_dawakhana_official",
-  "version": "1.0.0",
+  "name": "unani-dawakhana",
+  "version": "2.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo no tests"
   },
   "keywords": [],
   "author": "",
