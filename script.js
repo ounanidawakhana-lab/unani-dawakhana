@@ -836,7 +836,35 @@ const renderHomeView = (container) => {
       
       <div style="width:50px; height:4px; background:var(--primary); border-radius:4px; margin:0 auto 16px;"></div>
       <h3 style="font-family:'Outfit',sans-serif; font-size:1.2rem; color:var(--primary); margin-bottom:4px;">Unani Dawakhana</h3>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; font-weight:500;">Authentic Herbal Formulations Since 1990</p>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; font-weight:500;">Authentic Herbal Formulations Since 1990</p>
+      
+      <div style="background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); text-align:left; max-width:400px; margin:0 auto 20px;">
+        <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:6px;">Contact Us</h4>
+        
+        <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:10px;">
+          <span style="font-size:1.2rem;">📍</span>
+          <div>
+            <p style="font-size:0.8rem; font-weight:700; color:#111; margin:0;">Clinic Address</p>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:0; line-height:1.4;">Main Market Road, Near Jama Masjid, Delhi - 110006</p>
+          </div>
+        </div>
+        
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <span style="font-size:1.2rem;">📞</span>
+          <div>
+            <p style="font-size:0.8rem; font-weight:700; color:#111; margin:0;">Helpline Number</p>
+            <a href="tel:+919876543210" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">+91 98765 43210</a>
+          </div>
+        </div>
+        
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.2rem;">✉️</span>
+          <div>
+            <p style="font-size:0.8rem; font-weight:700; color:#111; margin:0;">Email Support</p>
+            <a href="mailto:saqibmiftahi69@gmail.com" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">saqibmiftahi69@gmail.com</a>
+          </div>
+        </div>
+      </div>
       
       <p style="font-size:0.75rem; color:var(--text-muted); opacity:0.8; line-height:1.5;">Made with ❤️ in India<br><br>Disclaimer: Our products are based on Unani medicine principles. Please consult our Hakeem before starting any new remedy, especially if you have chronic medical conditions.</p>
     </div>
