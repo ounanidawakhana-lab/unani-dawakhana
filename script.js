@@ -811,6 +811,30 @@ const renderHomeView = (container) => {
         <div class="products-showcase-grid" id="products-grid-container"></div>
       </div>
     </section>
+
+    <!-- Trust Badges & Footer -->
+    <div style="background:var(--primary-ultra-light); padding:30px 16px; margin-top:10px; text-align:center; padding-bottom:90px;">
+      <div style="display:flex; justify-content:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+        <div style="background:#fff; padding:12px; border-radius:12px; font-size:0.75rem; font-weight:700; color:var(--primary); flex:1; min-width:90px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:1.8rem; margin-bottom:6px;">💯</div>
+          100% Genuine
+        </div>
+        <div style="background:#fff; padding:12px; border-radius:12px; font-size:0.75rem; font-weight:700; color:var(--primary); flex:1; min-width:90px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🚚</div>
+          Fast Delivery
+        </div>
+        <div style="background:#fff; padding:12px; border-radius:12px; font-size:0.75rem; font-weight:700; color:var(--primary); flex:1; min-width:90px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🔒</div>
+          Secure COD
+        </div>
+      </div>
+      
+      <div style="width:50px; height:4px; background:var(--primary); border-radius:4px; margin:0 auto 16px;"></div>
+      <h3 style="font-family:'Outfit',sans-serif; font-size:1.2rem; color:var(--primary); margin-bottom:4px;">Unani Dawakhana</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; font-weight:500;">Authentic Herbal Formulations Since 1990</p>
+      
+      <p style="font-size:0.75rem; color:var(--text-muted); opacity:0.8; line-height:1.5;">Made with ❤️ in India<br><br>Disclaimer: Our products are based on Unani medicine principles. Please consult our Hakeem before starting any new remedy, especially if you have chronic medical conditions.</p>
+    </div>
   `;
   renderProductsGrid();
 };
