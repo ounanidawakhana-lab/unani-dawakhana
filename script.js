@@ -1829,9 +1829,18 @@ if (checkoutTrigger) {
 }
 
 const openCheckoutModal = () => {
+  const checkoutModal = document.getElementById("checkout-modal");
   if (checkoutModal) {
+    const cartPaymentMode = document.querySelector('input[name="cart_payment_mode"]:checked');
+    if (cartPaymentMode) {
+      const checkoutRadios = document.getElementsByName('payment_mode');
+      checkoutRadios.forEach(r => {
+        if (cartPaymentMode.value === 'Online' && r.value === 'WhatsApp') r.checked = true;
+        if (cartPaymentMode.value === 'COD' && r.value === 'COD') r.checked = true;
+      });
+    }
     checkoutModal.classList.add("open");
-    renderCheckoutSummary();
+    if (typeof renderCheckoutSummary === 'function') renderCheckoutSummary();
   }
 };
 
