@@ -3,6 +3,11 @@
 // ==========================================================================
 
 // 1. DEFAULT DATA INJECTOR (Run on initial setup)
+// Supabase Configuration
+const supabaseUrl = 'https://jsekxtywryrclkyouwvy.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZWt4dHl3cnlyY2xreW91d3Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDE5NzcsImV4cCI6MjA5NDE3Nzk3N30.C19DuTRyy8ohkxED2HfU4Tl2eAaUILWZN7EbOFiK2WU';
+window.supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
 const DEFAULT_PRODUCTS = [
     {
       id: "qasmi-unani-hair-shampoo",
@@ -463,10 +468,9 @@ const renderProductDetails = (container, productId) => {
             <h2 style="font-size: 2.2rem; line-height: 1.2; margin-bottom: 8px; color: var(--primary); text-align: left;">${product.name}</h2>
             
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
-              <span style="color: var(--accent); font-weight: bold; font-size: 1.1rem;">★★★★★</span>
-              <span style="font-size: 0.85rem; color: var(--text-muted);">(4.9 Clinical Rating from 120+ Patients)</span>
+              <span style="color: #ffb400; font-weight: bold; font-size: 1.2rem;">${product.rating || (4.5 + Math.random()*0.4).toFixed(1)} ⭐⭐⭐⭐⭐</span>
+              <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">(${product.reviews || Math.floor(Math.random()*400 + 50)}+ Patient Reviews)</span>
             </div>
-
             <p style="font-size: 1.05rem; margin-bottom: 24px; color: var(--text-muted);">${product.description}</p>
             
             <div style="background-color: var(--primary-ultra-light); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 20px; display: inline-flex; flex-direction: column; min-width: 250px; margin-bottom: 30px;">
@@ -581,7 +585,7 @@ window.renderAppointmentView = (container) => {
 
   const form = document.getElementById("appointment-form");
   if(form) {
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("apt-name").value;
       const phone = document.getElementById("apt-phone").value;
@@ -598,7 +602,14 @@ window.renderAppointmentView = (container) => {
         status: "Pending"
       };
       
-      // Update appointments array
+      try {
+        const { error } = await window.supabaseClient.from('appointments').insert([newApt]);
+        if (error) console.error("Supabase Error:", error);
+      } catch (err) {
+        console.error("Supabase Catch Error:", err);
+      }
+
+      // Update local appointments array for backwards compatibility
       appointments.push(newApt);
       saveAppointmentsState();
 
@@ -858,11 +869,18 @@ const renderProductsGrid = () => {
     return;
   }
 
-  container.innerHTML = filtered.map(p => `
+  container.innerHTML = filtered.map(p => {
+    const rating = p.rating || (4.5 + Math.random()*0.4).toFixed(1);
+    const reviews = p.reviews || Math.floor(Math.random()*400 + 50);
+    const badges = ['Bestseller', 'Trending', 'Most Ordered'];
+    const randomBadge = badges[Math.floor(Math.random() * badges.length)];
+    const badgeHtml = p.badge ? `<div style="background:#fef08a; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700; color:#b45309;">${p.badge}</div>` : `<div style="background:#fef08a; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700; color:#b45309;">${randomBadge}</div>`;
+    
+    return `
     <div class="product-card fade-in" onclick="buyNowDirect('${p.id}')" style="cursor:pointer;">
       <div class="product-img-box">
         <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
-        <span class="badge discount" style="position:absolute; top:8px; left:8px; background:#e91e63; font-size:0.65rem; padding:3px 6px;">15% OFF</span>
+        <span class="badge discount" style="position:absolute; top:8px; left:8px; background:#e91e63; font-size:0.65rem; padding:3px 6px;">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF</span>
         <button class="quick-add-btn" onclick="event.stopPropagation(); buyNowDirect('${p.id}')">+</button>
       </div>
       <div class="product-info">
@@ -870,14 +888,20 @@ const renderProductsGrid = () => {
           <span class="product-price">₹${p.price} <span style="font-size:0.7rem; color:var(--text-muted); text-decoration:line-through; font-weight:400;">₹${p.originalPrice}</span></span>
         </div>
         <h3 class="product-title">${p.name}</h3>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">1 pack</p>
+        
+        <div style="display:flex; align-items:center; gap:4px; margin-bottom:8px; margin-top:2px;">
+          <span style="font-size:0.8rem; font-weight:700; color:#111;">${rating}</span>
+          <span style="font-size:0.8rem; color:#ffb400;">⭐</span>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">(${reviews} reviews)</span>
+        </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="background:#fef08a; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700; color:#b45309;">Trending</div>
+          ${badgeHtml}
           <button style="background:var(--primary); color:#fff; border:none; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:700; cursor:pointer;">Buy Now</button>
         </div>
       </div>
     </div>
-  `).join("");
+  `}).join("");
 };
 window.renderProductsGrid = renderProductsGrid;
 
@@ -1005,9 +1029,33 @@ const switchAdminTab = (tabId) => {
 };
 window.switchAdminTab = switchAdminTab;
 
-const renderAdminTabContent = () => {
+const renderAdminTabContent = async () => {
   const container = document.getElementById("admin-dashboard-body");
   if (!container) return;
+
+  // Show loading while fetching
+  container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--primary); font-family:\'Outfit\',sans-serif;">Fetching Secure Database...<br><br>⏳</div>';
+
+  let orders = [];
+  let appointments = [];
+  
+  try {
+    const { data: oData, error: oErr } = await window.supabaseClient.rpc('admin_get_orders', { passcode: '789576' });
+    if (!oErr && oData) {
+      orders = oData.map(o => ({...o, total: parseFloat(o.total)}));
+    } else if (oErr) {
+      console.error("Supabase Order Error:", oErr);
+    }
+    
+    const { data: aData, error: aErr } = await window.supabaseClient.rpc('admin_get_appointments', { passcode: '789576' });
+    if (!aErr && aData) {
+      appointments = aData;
+    } else if (aErr) {
+      console.error("Supabase Apt Error:", aErr);
+    }
+  } catch(e) {
+    console.error("Supabase fetch exception:", e);
+  }
 
   if (adminActiveTab === "dashboard") {
     // Calculate total values
@@ -1391,16 +1439,21 @@ const adminLogout = () => {
 window.adminLogout = adminLogout;
 
 // Order Status & Delivery Changes
-const changeOrderStatus = (orderId, newStatus) => {
-  const order = orders.find(o => o.id === orderId);
-  if (!order) return;
-  order.status = newStatus;
-  
-  if (newStatus === "Delivered") {
-    order.paymentStatus = "Paid";
+const changeOrderStatus = async (orderId, newStatus) => {
+  try {
+    await window.supabaseClient.rpc('admin_update_order', { passcode: '789576', order_id: orderId, new_status: newStatus });
+  } catch (err) {
+    console.error("Failed to update status in Supabase", err);
   }
   
-  saveOrdersState();
+  // Update local state fallback
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    order.status = newStatus;
+    if (newStatus === "Delivered") order.paymentStatus = "Paid";
+    saveOrdersState();
+  }
+  
   renderAdminTabContent();
 };
 window.changeOrderStatus = changeOrderStatus;
@@ -1410,8 +1463,14 @@ const confirmDelivery = (orderId) => {
 };
 window.confirmDelivery = confirmDelivery;
 
-const deleteOrder = (orderId) => {
+const deleteOrder = async (orderId) => {
   if (confirm(`Are you sure you want to delete order ${orderId}?`)) {
+    try {
+      await window.supabaseClient.rpc('admin_delete_order', { passcode: '789576', order_id: orderId });
+    } catch (err) {
+      console.error("Failed to delete from Supabase", err);
+    }
+    
     orders = orders.filter(o => o.id !== orderId);
     saveOrdersState();
     renderAdminTabContent();
@@ -1542,17 +1601,30 @@ const handleProductSave = (e) => {
 };
 
 // Appointment Management
-const changeAptStatus = (aptId, newStatus) => {
+const changeAptStatus = async (aptId, newStatus) => {
+  try {
+    await window.supabaseClient.rpc('admin_update_appointment', { passcode: '789576', apt_id: aptId, new_status: newStatus });
+  } catch (err) {
+    console.error("Failed to update apt status", err);
+  }
+
   const apt = appointments.find(a => a.id === aptId);
-  if (!apt) return;
-  apt.status = newStatus;
-  saveAppointmentsState();
+  if (apt) {
+    apt.status = newStatus;
+    saveAppointmentsState();
+  }
   renderAdminTabContent();
 };
 window.changeAptStatus = changeAptStatus;
 
-const deleteApt = (aptId) => {
+const deleteApt = async (aptId) => {
   if (confirm(`Delete appointment record ${aptId}?`)) {
+    try {
+      await window.supabaseClient.rpc('admin_delete_appointment', { passcode: '789576', apt_id: aptId });
+    } catch (err) {
+      console.error("Failed to delete apt", err);
+    }
+    
     appointments = appointments.filter(a => a.id !== aptId);
     saveAppointmentsState();
     renderAdminTabContent();
@@ -1668,7 +1740,7 @@ if (checkoutForm) {
   });
 }
 
-const submitOrder = (mode) => {
+const submitOrder = async (mode) => {
   const name = document.getElementById("chk-name").value;
   const phone = document.getElementById("chk-phone").value;
   const address = document.getElementById("chk-address").value;
@@ -1680,7 +1752,7 @@ const submitOrder = (mode) => {
     return;
   }
 
-  const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+  const orderId = `ORD-${Date.now()}`;
   const orderTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
   const orderItemsText = cart.map(item => `${item.name} (x${item.qty})`).join(", ");
 
@@ -1694,9 +1766,9 @@ const submitOrder = (mode) => {
   });
   saveProductsState();
 
-  // Save order to local state (Mock Backend)
+  // Save order to Supabase & local state
   const newOrder = {
-    id: `ORD-${Date.now()}`,
+    id: orderId,
     date: new Date().toISOString().split("T")[0],
     name: name,
     phone: phone,
@@ -1704,10 +1776,18 @@ const submitOrder = (mode) => {
     city: city,
     pincode: pincode,
     productName: orderItemsText,
-    total: orderTotal,
+    total: orderTotal.toString(),
     status: "New Order",
-    paymentStatus: "Pending"
+    payment_mode: mode
   };
+  
+  try {
+    const { error } = await window.supabaseClient.from('orders').insert([newOrder]);
+    if (error) console.error("Supabase Error:", error);
+  } catch (err) {
+    console.error("Supabase Catch Error:", err);
+  }
+
   orders.push(newOrder);
   saveOrdersState();
 
@@ -2060,43 +2140,50 @@ const saveOrders = (orders) => localStorage.setItem("dawakhana_orders", JSON.str
 window.renderTrackerView = (container) => {
   container.innerHTML = `
     <div style="padding:1.5rem 1rem; text-align:center;">
-      <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:1rem;">Track Your Order ??</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Enter your mobile number to check delivery status.</p>
-      <input type="text" id="track-phone" placeholder="Mobile Number (e.g. 9876543210)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:1rem; font-size:1rem;">
+      <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:1rem;">Track Your Order 📦</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Enter your Order ID to check delivery status.</p>
+      <input type="text" id="track-id" placeholder="Order ID (e.g. ORD-170000000)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:1rem; font-size:1rem;">
       <button class="btn-primary" onclick="checkOrderStatus()" style="width:100%; padding:12px;">Track Status</button>
       <div id="track-result" style="margin-top:2rem; text-align:left;"></div>
     </div>
   `;
 };
 
-window.checkOrderStatus = () => {
-  const phone = document.getElementById("track-phone").value.trim();
+window.checkOrderStatus = async () => {
+  const orderId = document.getElementById("track-id").value.trim();
   const res = document.getElementById("track-result");
-  if(!phone) {
-    res.innerHTML = "<p style=\"color:red; text-align:center;\">Please enter a valid mobile number.</p>";
+  if(!orderId) {
+    res.innerHTML = "<p style=\"color:red; text-align:center;\">Please enter a valid Order ID.</p>";
     return;
   }
-  const orders = getOrders();
-  const userOrders = orders.filter(o => o.phone === phone);
   
-  if(userOrders.length === 0) {
-    res.innerHTML = `
-      <div style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); text-align:center;">
-        <span style="font-size:2rem;">??</span>
-        <h3 style="margin-top:10px; color:var(--primary);">No Orders Found</h3>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">We couldn't find any orders linked to this number.</p>
-      </div>`;
-  } else {
-    res.innerHTML = userOrders.map(o => `
-      <div style="background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:1rem; border-left:4px solid #25D366;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-weight:bold; font-size:0.9rem;">Order: ${o.item}</span>
-          <span style="background:#e6f4ea; color:#0d652d; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${o.status}</span>
+  res.innerHTML = '<div style="text-align:center; padding: 20px;">Fetching status...</div>';
+  
+  try {
+    const { data: userOrders, error } = await window.supabaseClient.rpc('get_order_by_id', { order_id: orderId });
+    
+    if(error || !userOrders || userOrders.length === 0) {
+      res.innerHTML = `
+        <div style="background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); text-align:center;">
+          <span style="font-size:2rem;">🤷‍♂️</span>
+          <h3 style="margin-top:10px; color:var(--primary);">No Orders Found</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">We couldn't find an order with ID ${orderId}.</p>
+        </div>`;
+    } else {
+      res.innerHTML = userOrders.map(o => `
+        <div style="background:#fff; padding:1rem; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:1rem; border-left:4px solid #25D366;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:bold; font-size:0.9rem;">${o.id}</span>
+            <span style="background:#e6f4ea; color:#0d652d; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${o.status}</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Placed on: ${o.date}</p>
+          <p style="font-size:0.85rem;"><strong>Items:</strong> ${o.productName}</p>
+          <p style="font-size:0.85rem;"><strong>Payment:</strong> ${o.payment_mode}</p>
         </div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Updated: ${o.date}</p>
-        <p style="font-size:0.85rem;"><strong>Tracking Note:</strong> ${o.note || "Will be delivered soon."}</p>
-      </div>
-    `).join("");
+      `).join("");
+    }
+  } catch (err) {
+    res.innerHTML = "<p style=\"color:red; text-align:center;\">Network error checking order.</p>";
   }
 };
 
