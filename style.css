@@ -98,10 +98,42 @@ header.sticky-header {position:sticky;top:0;z-index:10;background:var(--glass-bg
   color: var(--primary);
 }
 .product-price {
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.original-price {
+  font-size: 0.85rem;
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Zepto Style ADD Button */
+.btn-add {
+  background-color: #f1f8f5;
   color: var(--primary);
-  font-size: 1.3rem;
-  margin: 0.5rem 0;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 6px 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.btn-add:hover {
+  background-color: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.btn-add:active {
+  transform: translateY(1px);
 }
 .product-desc {
   font-size: 0.9rem;
@@ -569,6 +601,70 @@ header.sticky-header {position:sticky;top:0;z-index:10;background:var(--glass-bg
 .form-grid {
   display: grid;
   gap: 10px;
+}
+
+/* Customer Review Marquee */
+.review-marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+}
+.review-marquee {
+  display: flex;
+  gap: 16px;
+  animation: marquee-scroll 40s linear infinite;
+  padding-left: 16px;
+}
+.review-marquee:hover {
+  animation-play-state: paused;
+}
+.review-card {
+  flex: 0 0 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.review-author {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+.review-location {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.review-rating {
+  color: #ffb400;
+  font-size: 0.85rem;
+}
+.review-text {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  line-height: 1.4;
+  font-style: italic;
+}
+.review-quote {
+  color: var(--accent);
+  font-size: 1.2rem;
+  opacity: 0.5;
+  line-height: 0;
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 .payment-options {
   display: flex;

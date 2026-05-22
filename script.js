@@ -83,7 +83,32 @@ const DEFAULT_PRODUCTS = [
     }
   ];
 
-let products = JSON.parse(localStorage.getItem("ud_products")) || DEFAULT_PRODUCTS;
+let products = DEFAULT_PRODUCTS; // Initial fast-load state
+let isProductsLoaded = false;
+
+// Async fetch from Supabase
+const fetchCloudProducts = async () => {
+  try {
+    const { data, error } = await window.supabaseClient.from('products').select('*').order('name', { ascending: true });
+    if (!error && data && data.length > 0) {
+      products = data.map(p => ({
+        ...p,
+        price: parseFloat(p.price),
+        originalPrice: parseFloat(p.originalPrice),
+        rating: p.rating ? parseFloat(p.rating) : null,
+        reviews: p.reviews ? parseInt(p.reviews) : null
+      }));
+      isProductsLoaded = true;
+      if (window.location.hash === "#home" || window.location.hash === "") {
+        if(typeof renderProductsGrid === "function") renderProductsGrid();
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch cloud products", err);
+  }
+};
+// Trigger fetch
+setTimeout(fetchCloudProducts, 50);
 let orders = JSON.parse(localStorage.getItem("ud_orders")) || [];
 let appointments = JSON.parse(localStorage.getItem("ud_appointments")) || [];
 let cart = JSON.parse(localStorage.getItem("ud_cart")) || [];
@@ -146,6 +171,25 @@ const updateThemeIcons = (theme) => {
   }
 };
 
+window.showToast = (msg, type='info') => {
+  const toast = document.createElement('div');
+  toast.innerText = msg;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '80px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+  toast.style.color = '#fff';
+  toast.style.padding = '12px 24px';
+  toast.style.borderRadius = '30px';
+  toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+  toast.style.zIndex = '99999';
+  toast.style.fontSize = '0.9rem';
+  toast.style.fontWeight = '600';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+};
+
 // ==========================================================================
 // SPA ROUTER ENGINE
 // ==========================================================================
@@ -175,16 +219,22 @@ const renderAdminLogin = (container) => {
     e.preventDefault();
     const passcode = document.getElementById("admin-passcode").value;
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Verifying...";
+    submitBtn.disabled = true;
+
     try {
-      // Mock Client-Side Auth for Vercel Static deployment
-      if (passcode === "7860" || passcode === "123456") {
-        sessionStorage.setItem("ud_admin_auth", "true");
-        sessionStorage.setItem("ud_admin_token", "mock-secure-token-8923");
-        errorMsg.style.display = "none";
-        router(); // Re-trigger routing
-      } else {
-        throw new Error("Invalid Auth");
-      }
+      // Secure Cloud Bcrypt Authentication Check
+      const { data, error } = await window.supabaseClient.rpc('admin_get_orders', { passcode: passcode });
+      
+      if (error) throw new Error("Invalid Auth");
+      
+      // Auth success
+      sessionStorage.setItem("ud_admin_auth", "true");
+      sessionStorage.setItem("ud_admin_token", passcode); 
+      errorMsg.style.display = "none";
+      router(); 
     } catch (err) {
       errorMsg.style.display = "block";
       document.getElementById("admin-passcode").value = "";
@@ -192,9 +242,12 @@ const renderAdminLogin = (container) => {
       const card = document.querySelector(".admin-login-card");
       if (card) {
         card.classList.remove("shake-effect");
-        void card.offsetWidth; // Trigger reflow
+        void card.offsetWidth; 
         card.classList.add("shake-effect");
       }
+    } finally {
+      submitBtn.innerText = originalText;
+      submitBtn.disabled = false;
     }
   });
 };
@@ -215,29 +268,50 @@ const router = () => {
   const appRoot = document.getElementById("app-root");
   appRoot.innerHTML = "";
 
+  const updateSEO = (title, desc) => {
+    document.title = title + " | Unani Dawakhana";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute("content", desc);
+  };
+
   if (hash === '#tracker') {
+    updateSEO("Track Order", "Track your Unani Dawakhana delivery status in real-time.");
     window.renderTrackerView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash === '#admin') {
+    updateSEO("Admin Panel", "Secure Dawakhana Owner Portal.");
     window.renderAdminView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash === '#menu') {
+    updateSEO("Menu", "Explore our services and navigation menu.");
     window.renderMenuView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash === '#appointment') {
+    updateSEO("Book Appointment", "Consult with our expert Hakeems for personalized Unani treatment.");
     window.renderAppointmentView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash === '#about') {
+    updateSEO("About Us", "Learn about our 30+ year legacy in authentic Unani healing.");
     window.renderAboutView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash === '#services') {
+    updateSEO("Services", "Hijama, Nadi Pariksha, and more Unani therapies.");
     window.renderServicesView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === '#privacy') {
+    updateSEO("Privacy Policy", "Read our Privacy Policy.");
+    window.renderPrivacyView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === '#terms') {
+    updateSEO("Terms & Conditions", "Read our Terms and Conditions.");
+    window.renderTermsView(appRoot);
     window.scrollTo(0, 0);
   } else if (hash.startsWith("#product/")) {
     const productId = hash.split("/")[1];
     renderProductDetails(appRoot, productId);
     window.scrollTo(0, 0);
   } else {
+    updateSEO("Premium Herbal Formulations", "100% Original Unani & Ayurvedic Formulations. Get premium herbal medicines delivered directly to you.");
     // Normal store pages are sections of home view
     renderHomeView(appRoot);
     
@@ -366,8 +440,23 @@ const updateCartBadge = () => {
   const badge = document.getElementById("cart-badge-count");
   const drawerCount = document.getElementById("cart-drawer-count");
   const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
+  const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  
   if (badge) badge.innerText = totalCount;
   if (drawerCount) drawerCount.innerText = totalCount;
+  
+  // Sticky Cart Strip Zepto Style
+  const stickyStrip = document.getElementById("sticky-cart-strip");
+  if (stickyStrip) {
+    if (totalCount > 0) {
+      stickyStrip.style.display = "flex";
+      document.getElementById("sticky-cart-qty").innerText = totalCount;
+      document.getElementById("sticky-cart-total").innerText = "₹" + totalPrice;
+    } else {
+      stickyStrip.style.display = "none";
+    }
+  }
+
   renderCartItems();
 };
 
@@ -783,27 +872,24 @@ const renderHomeView = (container) => {
       </div>
     </div>
 
-    <!-- Fake Reviews Section -->
-    <div style="padding: 0 1rem; margin-bottom: 16px;">
-      <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; color:var(--primary); font-weight:700; margin-bottom:10px;">What Our Customers Say ❤️</h3>
-      <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; -webkit-overflow-scrolling:touch;">
-        
-        <div style="min-width:240px; background:#fff; padding:12px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #f0f0f0;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="font-weight:700; font-size:0.9rem;">Rahul K.</span>
-            <span style="color:#ffb400; font-size:0.8rem;">⭐⭐⭐⭐⭐</span>
-          </div>
-          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">"Best herbal products! I ordered Majun and the delivery was super fast. Highly recommended."</p>
+    <!-- Trust / Testimonials Marquee -->
+    <div style="margin: 20px 0;">
+      <h3 style="font-family:'Outfit',sans-serif; font-size:1.2rem; color:var(--primary); padding: 0 16px; margin-bottom: 12px; font-weight:700;">What Our Customers Say ❤️</h3>
+      <div class="review-marquee-container">
+        <div class="review-marquee">
+          ${typeof customerReviews !== 'undefined' ? customerReviews.map(r => `
+            <div class="review-card">
+              <div class="review-header">
+                <div>
+                  <div class="review-author">${r.name}</div>
+                  <div class="review-location">📍 ${r.location}</div>
+                </div>
+                <div class="review-rating">${'⭐'.repeat(r.rating)}</div>
+              </div>
+              <div class="review-text" style="direction: ${r.lang === 'ur' ? 'rtl' : 'ltr'}; font-family: ${r.lang === 'ur' ? 'Arial, sans-serif' : 'inherit'};">"${r.text}"</div>
+            </div>
+          `).join('') : '<p>Loading reviews...</p>'}
         </div>
-
-        <div style="min-width:240px; background:#fff; padding:12px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #f0f0f0;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="font-weight:700; font-size:0.9rem;">Ayesha S.</span>
-            <span style="color:#ffb400; font-size:0.8rem;">⭐⭐⭐⭐⭐</span>
-          </div>
-          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">"Original Unani formulations. Very effective and authentic. Customer support is also great."</p>
-        </div>
-
       </div>
     </div>
 
@@ -866,6 +952,12 @@ const renderHomeView = (container) => {
         </div>
       </div>
       
+      <div style="margin-bottom: 20px; font-size: 0.8rem; font-weight: 600; display: flex; justify-content: center; gap: 15px;">
+        <a href="#privacy" style="color: var(--accent); text-decoration: none;">Privacy Policy</a>
+        <span style="color: #ccc;">|</span>
+        <a href="#terms" style="color: var(--accent); text-decoration: none;">Terms & Conditions</a>
+      </div>
+      
       <p style="font-size:0.75rem; color:var(--text-muted); opacity:0.8; line-height:1.5;">Made with ❤️ in India<br><br>Disclaimer: Our products are based on Unani medicine principles. Please consult our Hakeem before starting any new remedy, especially if you have chronic medical conditions.</p>
     </div>
   `;
@@ -925,7 +1017,7 @@ const renderProductsGrid = () => {
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           ${badgeHtml}
-          <button style="background:var(--primary); color:#fff; border:none; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:700; cursor:pointer;">Buy Now</button>
+          <button onclick="event.preventDefault(); addToCart('${p.id}', 1); showToast('Added to Cart', 'success');" class="btn-add">ADD</button>
         </div>
       </div>
     </div>
@@ -1345,6 +1437,18 @@ const renderAdminTabContent = async () => {
                   <label for="crud-highlights">Highlights (Comma Separated)</label>
                   <input type="text" id="crud-highlights" placeholder="100% natural, GMP certified">
                 </div>
+                <div class="form-group">
+                  <label for="crud-rating">Rating (e.g. 4.8)</label>
+                  <input type="number" step="0.1" id="crud-rating" placeholder="4.8">
+                </div>
+                <div class="form-group">
+                  <label for="crud-reviews">Reviews Count</label>
+                  <input type="number" id="crud-reviews" placeholder="120">
+                </div>
+                <div class="form-group col-span-3">
+                  <label for="crud-badge">Badge Label</label>
+                  <input type="text" id="crud-badge" placeholder="Trending, Bestseller, Most Ordered">
+                </div>
               </div>
               <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
                 <button type="button" class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="toggleAddProductForm()">Cancel</button>
@@ -1518,11 +1622,15 @@ const adjustProductStock = (productId, delta) => {
 window.adjustProductStock = adjustProductStock;
 
 // Delete Product
-const deleteProduct = (productId) => {
-  if (confirm("Are you sure you want to delete this remedy from shop?")) {
-    products = products.filter(p => p.id !== productId);
-    saveProductsState();
-    renderAdminTabContent();
+const deleteProduct = async (productId) => {
+  if (confirm("Are you sure you want to delete this remedy from the Cloud Database?")) {
+    try {
+      await window.supabaseClient.rpc('admin_delete_product', { passcode: '789576', p_id: productId });
+      products = products.filter(p => p.id !== productId);
+      renderAdminTabContent();
+    } catch(err) {
+      alert("Failed to delete from cloud");
+    }
   }
 };
 window.deleteProduct = deleteProduct;
@@ -1567,10 +1675,13 @@ const loadEditForm = (productId) => {
   preview.style.display = "block";
 
   document.getElementById("crud-highlights").value = product.highlights.join(", ");
+  document.getElementById("crud-rating").value = product.rating || "";
+  document.getElementById("crud-reviews").value = product.reviews || "";
+  document.getElementById("crud-badge").value = product.badge || "";
 };
 window.loadEditForm = loadEditForm;
 
-const handleProductSave = (e) => {
+const handleProductSave = async (e) => {
   e.preventDefault();
   const idVal = document.getElementById("crud-prod-id").value;
   const nameVal = document.getElementById("crud-name").value;
@@ -1590,6 +1701,13 @@ const handleProductSave = (e) => {
     ? highlightsRaw.split(",").map(hl => hl.trim()).filter(hl => hl !== "")
     : ["100% Organic Remedy", "Formulated by Clinical Experts"];
 
+  const ratingRaw = document.getElementById("crud-rating").value;
+  const reviewsRaw = document.getElementById("crud-reviews").value;
+  const badgeVal = document.getElementById("crud-badge").value.trim();
+
+  const ratingVal = ratingRaw ? parseFloat(ratingRaw) : null;
+  const reviewsVal = reviewsRaw ? parseInt(reviewsRaw) : null;
+
   const payload = {
     id: idVal || nameVal.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
     name: nameVal,
@@ -1600,28 +1718,53 @@ const handleProductSave = (e) => {
     image: finalImgVal,
     sold: 0,
     category: "General",
-    highlights: highlightsVal
+    highlights: highlightsVal,
+    rating: ratingVal,
+    reviews: reviewsVal,
+    badge: badgeVal || null
   };
 
-  if (idVal) {
-    // Edit Mode
-    const product = products.find(p => p.id === idVal);
-    if (product) Object.assign(product, payload);
-  } else {
-    // Add Mode
-    products.push(payload);
-  }
+  // Sync to Supabase
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerText;
+  submitBtn.innerText = "Saving to Cloud ⏳...";
+  submitBtn.disabled = true;
 
-  saveProductsState();
-  
-  // Also sync to backend API silently
-  const token = sessionStorage.getItem("ud_admin_token");
-  if (token) {
-    fetch('/api/admin/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(payload)
-    }).catch(err => console.error("Sync error:", err));
+  try {
+    const { error } = await window.supabaseClient.rpc('admin_upsert_product', {
+      passcode: '789576',
+      p_id: payload.id,
+      p_name: payload.name,
+      p_price: payload.price,
+      p_orig: payload.originalPrice,
+      p_desc: payload.description,
+      p_stock: payload.stock,
+      p_image: payload.image,
+      p_cat: payload.category,
+      p_high: payload.highlights,
+      p_rating: payload.rating,
+      p_reviews: payload.reviews,
+      p_badge: payload.badge
+    });
+    
+    if (error) throw error;
+
+    if (idVal) {
+      const product = products.find(p => p.id === idVal);
+      if (product) Object.assign(product, payload);
+    } else {
+      products.push(payload);
+    }
+    
+    // Sort array so it matches cloud view nicely
+    products.sort((a,b) => a.name.localeCompare(b.name));
+    
+  } catch (err) {
+    console.error("Cloud sync error:", err);
+    alert("Failed to save to cloud: " + err.message);
+  } finally {
+    submitBtn.innerText = originalText;
+    submitBtn.disabled = false;
   }
 
   renderAdminTabContent();
@@ -1776,8 +1919,14 @@ const submitOrder = async (mode) => {
   const pincode = document.getElementById("chk-pincode").value;
 
   if (!/^\d{10}$/.test(phone.trim())) {
-    alert("Please enter a valid 10-digit phone number.");
+    showToast("Please enter a valid 10-digit phone number.", "error");
     return;
+  }
+
+  const submitBtn = document.getElementById("checkout-submit-btn");
+  if(submitBtn) {
+    submitBtn.innerText = "Processing Order ⏳...";
+    submitBtn.disabled = true;
   }
 
   const orderId = `ORD-${Date.now()}`;
@@ -1811,9 +1960,10 @@ const submitOrder = async (mode) => {
   
   try {
     const { error } = await window.supabaseClient.from('orders').insert([newOrder]);
-    if (error) console.error("Supabase Error:", error);
+    if (error) throw error;
   } catch (err) {
     console.error("Supabase Catch Error:", err);
+    showToast("Network error. Order saved locally.", "error");
   }
 
   orders.push(newOrder);
@@ -1859,6 +2009,11 @@ const submitOrder = async (mode) => {
     setTimeout(() => {
       window.location.hash = "tracker";
     }, 2000);
+  }
+
+  if(submitBtn) {
+    submitBtn.innerText = "Place Order Now";
+    submitBtn.disabled = false;
   }
 };
 
@@ -2171,7 +2326,7 @@ window.renderTrackerView = (container) => {
       <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:1rem;">Track Your Order 📦</h2>
       <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Enter your Order ID to check delivery status.</p>
       <input type="text" id="track-id" placeholder="Order ID (e.g. ORD-170000000)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:1rem; font-size:1rem;">
-      <button class="btn-primary" onclick="checkOrderStatus()" style="width:100%; padding:12px;">Track Status</button>
+      <button id="track-submit-btn" class="btn-primary" onclick="checkOrderStatus()" style="width:100%; padding:12px;">Track Status</button>
       <div id="track-result" style="margin-top:2rem; text-align:left;"></div>
     </div>
   `;
@@ -2180,9 +2335,15 @@ window.renderTrackerView = (container) => {
 window.checkOrderStatus = async () => {
   const orderId = document.getElementById("track-id").value.trim();
   const res = document.getElementById("track-result");
+  const trackBtn = document.getElementById("track-submit-btn");
   if(!orderId) {
-    res.innerHTML = "<p style=\"color:red; text-align:center;\">Please enter a valid Order ID.</p>";
+    showToast("Please enter a valid Order ID.", "error");
     return;
+  }
+  
+  if(trackBtn) {
+    trackBtn.innerText = "Tracking ⏳...";
+    trackBtn.disabled = true;
   }
   
   res.innerHTML = '<div style="text-align:center; padding: 20px;">Fetching status...</div>';
@@ -2211,7 +2372,13 @@ window.checkOrderStatus = async () => {
       `).join("");
     }
   } catch (err) {
-    res.innerHTML = "<p style=\"color:red; text-align:center;\">Network error checking order.</p>";
+    showToast("Network error checking order.", "error");
+    res.innerHTML = "";
+  } finally {
+    if(trackBtn) {
+      trackBtn.innerText = "Track Status";
+      trackBtn.disabled = false;
+    }
   }
 };
 
@@ -2256,13 +2423,36 @@ window.adminSaveOrder = () => {
 };
 
 
-// Override COD Submit Order
-const origSubmitOrder = submitOrder;
-window.submitOrder = (mode) => {
-  origSubmitOrder(mode);
-  if (mode === "COD") {
-    alert("Order Placed Successfully!\n\nYour order has been recorded. We will deliver it soon.");
-    window.location.hash = "tracker";
-  }
+window.renderPrivacyView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:40px;">
+      <div class="container" style="max-width:800px; margin:auto; background:#fff; padding:30px; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:20px;">Privacy Policy</h2>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">At Unani Dawakhana, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">1. Information We Collect</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">We collect information that you provide to us directly, such as when you place an order, book an appointment, or contact us. This may include your name, email address, phone number, and shipping address.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">2. How We Use Your Information</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">Your information is used solely to process your orders, schedule appointments, and provide customer support. We do not sell or share your personal data with third parties for marketing purposes.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">3. Data Security</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Our database is secured with modern encryption standards.</p>
+      </div>
+    </section>
+  `;
 };
 
+window.renderTermsView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:40px;">
+      <div class="container" style="max-width:800px; margin:auto; background:#fff; padding:30px; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); margin-bottom:20px;">Terms and Conditions</h2>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">Welcome to Unani Dawakhana. By accessing and using our website, you agree to comply with and be bound by the following terms and conditions.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">1. Medical Disclaimer</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">The information provided on this website is for educational purposes only and is not intended as a substitute for professional medical advice. Always consult a qualified healthcare provider before starting any new treatment.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">2. Product Orders</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">All orders are subject to availability. We reserve the right to limit the quantity of products we supply. Prices and product specifications are subject to change without notice.</p>
+        <h3 style="color:var(--primary); margin-bottom:10px; margin-top:20px;">3. Shipping and Delivery</h3>
+        <p style="color:var(--text-main); line-height:1.6; margin-bottom:15px;">We aim to deliver products within the estimated timeframes; however, delays may occur due to unforeseen circumstances. We are not liable for any delays beyond our control.</p>
+      </div>
+    </section>
+  `;
+};
