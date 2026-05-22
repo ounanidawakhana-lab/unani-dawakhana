@@ -216,13 +216,25 @@ const router = () => {
   const appRoot = document.getElementById("app-root");
   appRoot.innerHTML = "";
 
-  if (hash === 'tracker') {
+  if (hash === '#tracker') {
     window.renderTrackerView(appRoot);
     window.scrollTo(0, 0);
-  } else if (hash === 'admin') {
+  } else if (hash === '#admin') {
     window.renderAdminView(appRoot);
     window.scrollTo(0, 0);
-  } else if (hash.startsWith("product/")) {
+  } else if (hash === '#menu') {
+    window.renderMenuView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === '#appointment') {
+    window.renderAppointmentView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === '#about') {
+    window.renderAboutView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash === '#services') {
+    window.renderServicesView(appRoot);
+    window.scrollTo(0, 0);
+  } else if (hash.startsWith("#product/")) {
     const productId = hash.split("/")[1];
     renderProductDetails(appRoot, productId);
     window.scrollTo(0, 0);
@@ -231,8 +243,8 @@ const router = () => {
     renderHomeView(appRoot);
     
     // Smooth scroll to segment if targeted
-    if (hash && hash !== "home") {
-      const element = document.getElementById(hash);
+    if (hash && hash !== "#home") {
+      const element = document.getElementById(hash.replace('#', ''));
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
@@ -541,6 +553,177 @@ const renderProductDetails = (container, productId) => {
 };
 
 // B. General Home Page View
+window.renderAppointmentView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:20px;">
+      <div class="container" style="max-width:500px; margin:auto;">
+        <div style="background:var(--primary-ultra-light); padding:24px; border-radius:16px; text-align:center; margin-bottom:20px; border:1px solid var(--border);">
+          <div style="font-size:3rem; margin-bottom:10px;">🩺</div>
+          <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); font-size:1.5rem;">Book an Appointment</h2>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-top:8px;">Consult with our expert Hakeem for personalized Unani treatment.</p>
+        </div>
+        <form id="appointment-form" style="background:#fff; padding:20px; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.05); border:1px solid var(--border);">
+          <div class="form-group" style="margin-bottom:15px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-main); margin-bottom:6px;">Patient Name *</label>
+            <input type="text" id="apt-name" required placeholder="Enter full name" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+          </div>
+          <div class="form-group" style="margin-bottom:15px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-main); margin-bottom:6px;">Mobile Number *</label>
+            <input type="tel" id="apt-phone" required placeholder="10-digit mobile number" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+          </div>
+          <div class="form-group" style="margin-bottom:15px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-main); margin-bottom:6px;">Preferred Date *</label>
+            <input type="date" id="apt-date" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+          </div>
+          <div class="form-group" style="margin-bottom:15px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-main); margin-bottom:6px;">Health Concern / Symptoms *</label>
+            <textarea id="apt-concern" rows="3" required placeholder="Describe your health issue briefly..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:1rem; resize:none;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; font-size:1.1rem; margin-top:10px; padding:14px;">Confirm Booking</button>
+        </form>
+      </div>
+    </section>
+  `;
+
+  const form = document.getElementById("appointment-form");
+  if(form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("apt-name").value;
+      const phone = document.getElementById("apt-phone").value;
+      const date = document.getElementById("apt-date").value;
+      const concern = document.getElementById("apt-concern").value;
+      
+      const newApt = {
+        id: `APT-${Math.floor(1000 + Math.random() * 9000)}`,
+        date: date,
+        time: "To be confirmed",
+        name: name,
+        phone: phone,
+        symptoms: concern,
+        status: "Pending"
+      };
+      
+      // Update appointments array
+      appointments.push(newApt);
+      saveAppointmentsState();
+
+      alert(`Appointment Request Sent!\n\nID: ${newApt.id}\nThank you ${name}, we will contact you on ${phone} to confirm the time.`);
+      window.location.hash = "menu";
+    });
+  }
+};
+
+window.renderServicesView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:20px;">
+      <div class="container" style="max-width:600px; margin:auto;">
+        <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); text-align:center; margin-bottom:20px; font-size:1.5rem;">Our Services</h2>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="background:#fff; border-radius:12px; border:1px solid var(--border); overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <div style="height:140px; background:var(--primary-ultra-light); display:flex; align-items:center; justify-content:center; font-size:4rem;">🩸</div>
+            <div style="padding:20px;">
+              <h3 style="color:var(--primary); font-family:'Outfit',sans-serif; margin-bottom:8px;">Hijama (Cupping Therapy)</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Ancient Unani detoxification therapy that helps improve blood circulation, relieve pain, and extract toxins from the body.</p>
+            </div>
+          </div>
+          <div style="background:#fff; border-radius:12px; border:1px solid var(--border); overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <div style="height:140px; background:#fef08a; display:flex; align-items:center; justify-content:center; font-size:4rem;">🤲</div>
+            <div style="padding:20px;">
+              <h3 style="color:var(--primary); font-family:'Outfit',sans-serif; margin-bottom:8px;">Nadi Pariksha (Pulse Diagnosis)</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Traditional diagnostic method to accurately determine the root cause of ailments by reading the pulse rate and rhythm.</p>
+            </div>
+          </div>
+          <div style="background:#fff; border-radius:12px; border:1px solid var(--border); overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <div style="height:140px; background:#e0f2fe; display:flex; align-items:center; justify-content:center; font-size:4rem;">👨‍⚕️</div>
+            <div style="padding:20px;">
+              <h3 style="color:var(--primary); font-family:'Outfit',sans-serif; margin-bottom:8px;">General Consultation</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5;">Personalized health advice and custom Unani herbal prescriptions tailored to your specific body temperament (Mizaj).</p>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+          <a href="#appointment" class="btn btn-primary">Book a Session</a>
+        </div>
+      </div>
+    </section>
+  `;
+};
+
+window.renderAboutView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:20px;">
+      <div class="container" style="max-width:600px; margin:auto;">
+        <div style="text-align:center; margin-bottom:30px;">
+          <div style="width:100px; height:100px; background:var(--primary); border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#fff; box-shadow:0 8px 24px rgba(18,53,36,0.3);">🌿</div>
+          <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); font-size:1.8rem; margin-bottom:8px;">Unani Dawakhana</h2>
+          <p style="color:var(--text-muted); font-size:1rem; font-weight:600;">Authentic Healing Since 1990</p>
+        </div>
+        
+        <div style="background:#fff; padding:24px; border-radius:16px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.05); line-height:1.7; color:var(--text-main);">
+          <p style="margin-bottom:16px;">Welcome to <strong>Unani Dawakhana Official</strong>. We are dedicated to providing pure, unadulterated, and highly effective Unani and Ayurvedic formulations.</p>
+          <p style="margin-bottom:16px;">With over 30 years of clinical experience, our expert Hakeems have formulated remedies that address the root cause of ailments without any side effects.</p>
+          <h3 style="color:var(--primary); font-family:'Outfit',sans-serif; margin:24px 0 12px;">Our Mission</h3>
+          <p style="margin-bottom:16px;">To make ancient Unani healing accessible to everyone across India through pure ingredients and authentic compounding methods.</p>
+          <h3 style="color:var(--primary); font-family:'Outfit',sans-serif; margin:24px 0 12px;">Contact Details</h3>
+          <ul style="list-style:none; padding:0; margin:0; color:var(--text-muted);">
+            <li style="margin-bottom:8px;">📍 <strong>Clinic:</strong> Main Market Road, Near Jama Masjid</li>
+            <li style="margin-bottom:8px;">📞 <strong>Phone:</strong> +91 8796982661</li>
+            <li style="margin-bottom:8px;">📧 <strong>Email:</strong> support@unanidawakhana.com</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  `;
+};
+
+window.renderMenuView = (container) => {
+  container.innerHTML = `
+    <section class="section" style="padding-top:20px;">
+      <div class="container">
+        <h2 style="font-family:'Outfit',sans-serif; color:var(--primary); text-align:center; margin-bottom:20px; font-size:1.5rem;">Main Menu</h2>
+        <div style="display:grid; grid-template-columns:1fr; gap:12px; max-width:500px; margin:auto;">
+          <a href="#appointment" style="display:flex; align-items:center; gap:16px; background:#fff; padding:16px; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="background:#e0f2fe; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🩺</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--primary);">Book Appointment</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Consult our expert Hakeem</div>
+            </div>
+          </a>
+          <a href="#services" style="display:flex; align-items:center; gap:16px; background:#fff; padding:16px; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="background:#fef08a; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🌿</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--primary);">Our Services</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Hijama, Nadi Pariksha & more</div>
+            </div>
+          </a>
+          <a href="#about" style="display:flex; align-items:center; gap:16px; background:#fff; padding:16px; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="background:#fed7aa; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">ℹ️</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--primary);">About Us</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Know our legacy and mission</div>
+            </div>
+          </a>
+          <a href="#tracker" style="display:flex; align-items:center; gap:16px; background:#fff; padding:16px; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="background:#dcf8c6; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">📦</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--primary);">Track Order</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Check your delivery status</div>
+            </div>
+          </a>
+          <a href="#admin" style="display:flex; align-items:center; gap:16px; background:#fff; padding:16px; border-radius:12px; text-decoration:none; color:var(--text-main); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-top:20px;">
+            <div style="background:#f3f4f6; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">⚙️</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--text-main);">Admin Panel</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Manage dawakhana records</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  `;
+};
+
 const renderHomeView = (container) => {
   container.innerHTML = `
     <div class="app-top-header">
