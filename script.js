@@ -246,6 +246,15 @@ window.addEventListener("hashchange", router);
 window.addEventListener("load", () => {
   initTheme();
   
+  // Hide splash screen
+  setTimeout(() => {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.style.opacity = '0';
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, 1200);
+  
   if (sessionStorage.getItem("ud_admin_auth") === "true") {
     const token = sessionStorage.getItem("ud_admin_token");
     fetch('/api/admin/orders', { headers: { 'Authorization': `Bearer ${token}` }})
