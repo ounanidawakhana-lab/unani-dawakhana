@@ -68,7 +68,19 @@ header.sticky-header {position:sticky;top:0;z-index:10;background:var(--glass-bg
 .btn-add:hover {background:#e65c00;}
 
 /* Bottom navigation */
-.bottom-nav {position:fixed;bottom:0;left:0;right:0;background:var(--glass-bg);backdrop-filter:blur(6px);display:flex;justify-content:space-around;padding:0.5rem 0;border-top:1px solid var(--border);}
+.bottom-nav {position:fixed;bottom:0;left:0;right:0;background:var(--glass-bg);backdrop-filter:blur(6px);display:flex;justify-content:space-around;padding:0.5rem 0;border-top:1px solid var(--border);} 
+/* New UI sections */
+.hero {background: var(--primary-ultra-light); padding: 1rem; text-align:center;}
+.compact-hero {padding: 0.8rem;}
+.hero h1 {font-family: 'Outfit',sans-serif; margin-bottom:0.4rem; font-size:1.5rem; color: var(--primary);}
+.hero p {font-size:0.9rem; color: var(--text-muted);}
+.section-title {font-family:'Outfit',sans-serif; font-size:1.2rem; margin:0.8rem 0 0.4rem; text-align:center; color: var(--primary);}
+.offer-section {margin:0.8rem 0;}
+.offer-slider .offer {background: var(--accent); color:#fff; padding:0.6rem 0.8rem; border-radius: var(--radius-sm); font-size:0.9rem;}
+.category-icons a {font-size:1.4rem;}
+.floating-whatsapp-btn {position:fixed; right:1rem; bottom:80px; background:#25D366; color:#fff; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-lg); z-index:100;}
+.ai-chat-btn {position:fixed; right:1rem; bottom:150px; background: var(--primary); color:#fff; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; box-shadow: var(--shadow-lg); z-index:100;}
+
 .bottom-nav a {font-size:0.9rem;color:var(--text-main);text-align:center;flex:1;}
 .bottom-nav a.active {color:var(--primary);} 
 

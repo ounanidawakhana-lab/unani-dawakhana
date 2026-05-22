@@ -829,6 +829,15 @@ const renderHomeView = (container) => {
       </div>
     </section>
   `;
+  // Override with products only
+  container.innerHTML = `
+    <section class="section" id="products">
+      <div class="container">
+        <h2 class="section-title">Our Herbal Formulations</h2>
+        <div class="products-showcase-grid" id="products-grid-container"></div>
+      </div>
+    </section>
+  `;
 
   renderProductsGrid();
 
