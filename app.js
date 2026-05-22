@@ -1,0 +1,2121 @@
+// ==========================================================================
+// UNANI DAWAKHANA OFFICIAL - APP LOGIC & STATE ENGINE
+// ==========================================================================
+
+// 1. DEFAULT DATA INJECTOR (Run on initial setup)
+const DEFAULT_PRODUCTS = [
+    {
+      id: "qasmi-unani-hair-shampoo",
+      name: "Qasmi Unani Hair Shampoo",
+      price: 499,
+      originalPrice: 999,
+      description: "Qasmi Unani Hair Shampoo is a premium herbal hair care formula specially crafted with natural ingredients to gently cleanse, nourish, and support heal...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/IMG-20260509-WA0035.jpg?v=1778789827",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    },
+    {
+      id: "qasmi-unani-hair-oil",
+      name: "Qasmi Unani Hair Oil",
+      price: 499,
+      originalPrice: 999,
+      description: "Qasmi Unani Hair Oil is a premium Ayurvedic herbal hair care formula specially crafted with Aloe Vera and natural herbal ingredients to support health...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/IMG-20260509-WA0034_6baacfe9-d5c0-4e6d-add4-7dc012820c62.jpg?v=1778789355",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    },
+    {
+      id: "badshahi-nuksa",
+      name: "Badshahi Nuksa",
+      price: 5199,
+      originalPrice: 5699,
+      description: "Badshahii Nuksa is a premium Ayurvedic herbal wellness formula specially crafted to support men’s vitality, strength, stamina, and overall physical we...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/file_00000000305472078a467e1cd460d1b3_5fb3cc94-50fa-4bf6-b15a-69e8b9c74b3a.png?v=1778792258",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    },
+    {
+      id: "ling-ka-tel",
+      name: "Ling Ka Tel",
+      price: 499,
+      originalPrice: 999,
+      description: "Ling Ka Tel by Qasmi Unani Dawakhana is a premium Ayurvedic herbal oil specially formulated to support men’s wellness, vitality, stamina, and overall ...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/IMG-20260507-WA0019_3.jpg?v=1778783924",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    },
+    {
+      id: "badshahi-safuf",
+      name: "Badshahi Safuf",
+      price: 999,
+      originalPrice: 1499,
+      description: "Badshahi Safuf is a premium herbal wellness formula specially crafted using traditional Ayurvedic ingredients to help support energy, stamina, strengt...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/IMG-20260507-WA0017_3.jpg?v=1778783038",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    },
+    {
+      id: "badshahi-safuf-ling-ka-tel-combo-ayurvedic-men-wellness-pack",
+      name: "Badshahi Safuf & Ling Ka Tel Combo | Ayurvedic Men Wellness Pack",
+      price: 1499,
+      originalPrice: 1999,
+      description: "Experience the power of traditional Ayurvedic care with the Badshahi Safuf &amp; Ling Ka Tel Combo by Qasmi Unani Dawakhana. This specially formulated...",
+      image: "https://cdn.shopify.com/s/files/1/0679/0470/0459/files/WhatsAppImage2026-05-14at12.04.56PM.jpg?v=1778740571",
+      stock: 50,
+      sold: Math.floor(Math.random() * 50) + 10,
+      category: "General Wellness",
+      highlights: ["Premium quality herbal product.", "Safe and natural ingredients.", "Trusted Unani formulation."]
+    }
+  ];
+
+let products = JSON.parse(localStorage.getItem("ud_products")) || DEFAULT_PRODUCTS;
+let orders = JSON.parse(localStorage.getItem("ud_orders")) || [];
+let appointments = JSON.parse(localStorage.getItem("ud_appointments")) || [];
+let cart = JSON.parse(localStorage.getItem("ud_cart")) || [];
+
+let adminActiveTab = "dashboard";
+let orderFilterStatus = "All";
+let orderSearchQuery = "";
+
+// Storefront dynamic filters
+let storeActiveCategory = "All";
+let storeSearchQuery = "";
+
+// Save current states
+const saveProductsState = () => {
+  localStorage.setItem("ud_products", JSON.stringify(products));
+};
+const saveOrdersState = () => {
+  localStorage.setItem("ud_orders", JSON.stringify(orders));
+};
+const saveAppointmentsState = () => {
+  localStorage.setItem("ud_appointments", JSON.stringify(appointments));
+};
+const saveCartState = () => {
+  localStorage.setItem("ud_cart", JSON.stringify(cart));
+};
+
+// Base64 Image Converter
+window.handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById("crud-image-b64").value = e.target.result;
+    const preview = document.getElementById("crud-image-preview");
+    preview.src = e.target.result;
+    preview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+};
+
+// ==========================================================================
+// THEME SWITCHER
+// ==========================================================================
+const initTheme = () => {
+  const savedTheme = localStorage.getItem("ud_theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  updateThemeIcons(savedTheme);
+};
+
+const updateThemeIcons = (theme) => {
+  const sunIcon = document.querySelector(".theme-icon-sun");
+  const moonIcon = document.querySelector(".theme-icon-moon");
+  if (!sunIcon || !moonIcon) return;
+  if (theme === "dark") {
+    sunIcon.style.display = "none";
+    moonIcon.style.display = "block";
+  } else {
+    sunIcon.style.display = "block";
+    moonIcon.style.display = "none";
+  }
+};
+
+// ==========================================================================
+// SPA ROUTER ENGINE
+// ==========================================================================
+const renderAdminLogin = (container) => {
+  container.innerHTML = `
+    <div class="admin-login-wrapper">
+      <div class="admin-login-card">
+        <div class="admin-login-logo">🌿</div>
+        <h2 class="admin-login-title">Dawakhana Owner Portal</h2>
+        <p class="admin-login-desc">Please verify your clinical security passcode to access diagnostics and operations.</p>
+        <form id="admin-login-form" class="admin-login-form">
+          <div class="admin-login-input-group">
+            <input type="password" id="admin-passcode" class="admin-login-input" required placeholder="••••" maxlength="10">
+          </div>
+          <button type="submit" class="admin-login-btn">Verify Security Passcode</button>
+          <div class="admin-login-error" id="admin-login-error">⚠️ Invalid Owner Passcode! Access Denied.</div>
+        </form>
+        <a href="#home" style="display: inline-block; margin-top: 20px; font-size: 0.85rem; color: var(--accent); font-weight: 600;">← Back to Main Clinic Site</a>
+      </div>
+    </div>
+  `;
+
+  const form = document.getElementById("admin-login-form");
+  const errorMsg = document.getElementById("admin-login-error");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const passcode = document.getElementById("admin-passcode").value;
+    
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: passcode })
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        sessionStorage.setItem("ud_admin_auth", "true");
+        sessionStorage.setItem("ud_admin_token", data.token);
+        errorMsg.style.display = "none";
+        router(); // Re-trigger routing
+      } else {
+        throw new Error("Invalid Auth");
+      }
+    } catch (err) {
+      errorMsg.style.display = "block";
+      document.getElementById("admin-passcode").value = "";
+      
+      const card = document.querySelector(".admin-login-card");
+      if (card) {
+        card.classList.remove("shake-effect");
+        void card.offsetWidth; // Trigger reflow
+        card.classList.add("shake-effect");
+      }
+    }
+  });
+};
+
+const router = () => {
+  const hash = window.location.hash || "#home";
+  document.body.classList.remove("admin-mode");
+  
+  // Highlight navbar active link
+  const cleanHash = hash.split("/")[0];
+  document.querySelectorAll(".nav-link, .mobile-link").forEach(link => {
+    link.classList.remove("active");
+    if (link.getAttribute("href") === cleanHash) {
+      link.classList.add("active");
+    }
+  });
+
+  const appRoot = document.getElementById("app-root");
+  appRoot.innerHTML = "";
+
+  if (hash === "#admin") {
+    document.body.classList.add("admin-mode");
+    const isAuthenticated = sessionStorage.getItem("ud_admin_auth") === "true";
+    if (isAuthenticated) {
+      renderAdminDashboard(appRoot);
+    } else {
+      renderAdminLogin(appRoot);
+    }
+  } else if (hash.startsWith("#product/")) {
+    const productId = hash.split("/")[1];
+    renderProductDetails(appRoot, productId);
+    window.scrollTo(0, 0);
+  } else {
+    // Normal store pages are sections of home view
+    renderHomeView(appRoot);
+    
+    // Smooth scroll to segment if targeted
+    if (hash && hash !== "#home") {
+      const element = document.getElementById(hash.substring(1));
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }
+};
+
+window.addEventListener("hashchange", router);
+window.addEventListener("load", () => {
+  initTheme();
+  
+  if (sessionStorage.getItem("ud_admin_auth") === "true") {
+    const token = sessionStorage.getItem("ud_admin_token");
+    fetch('/api/admin/orders', { headers: { 'Authorization': `Bearer ${token}` }})
+      .then(r => r.json()).then(data => { 
+        if(Array.isArray(data)) {
+          orders = data.map(d=>({id: `ORD-${d.id}`, date: d.created_at.split(" ")[0], name: d.customerName, phone: d.customerPhone, address: d.address, city: d.city, pincode: d.pincode, productName: Array.isArray(d.items) ? d.items.map(i=>`${i.name} (x${i.qty})`).join(", ") : '', total: d.totalAmount, status: d.status, paymentStatus: d.paymentMethod}));
+          saveOrdersState();
+        }
+      });
+      
+    fetch('/api/admin/appointments', { headers: { 'Authorization': `Bearer ${token}` }})
+      .then(r => r.json()).then(data => { 
+        if(Array.isArray(data)) {
+          appointments = data.map(d=>({id: `APT-${d.id}`, date: d.date, time: d.time, name: d.name, phone: d.phone, symptoms: d.concern, status: "Pending"}));
+          saveAppointmentsState();
+        }
+        router();
+      });
+  } else {
+    router();
+  }
+  
+  updateCartBadge();
+});
+
+// ==========================================================================
+// CART ACTION HANDLERS
+// ==========================================================================
+const addToCart = (productId, qty = 1) => {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  if (product.stock <= 0) {
+    alert("This herbal remedy is currently out of stock.");
+    return;
+  }
+
+  const existingItem = cart.find(item => item.id === productId);
+  if (existingItem) {
+    if (existingItem.qty + qty > product.stock) {
+      alert(`Only ${product.stock} units are currently available.`);
+      return;
+    }
+    existingItem.qty += qty;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      qty: qty
+    });
+  }
+
+  saveCartState();
+  updateCartBadge();
+  openCartDrawer();
+};
+
+const updateCartQty = (productId, newQty) => {
+  const product = products.find(p => p.id === productId);
+  const cartItem = cart.find(item => item.id === productId);
+  if (!cartItem || !product) return;
+
+  if (newQty <= 0) {
+    cart = cart.filter(item => item.id !== productId);
+  } else {
+    if (newQty > product.stock) {
+      alert(`Only ${product.stock} units are currently available.`);
+      return;
+    }
+    cartItem.qty = newQty;
+  }
+  saveCartState();
+  updateCartBadge();
+  renderCartItems();
+};
+
+const updateCartBadge = () => {
+  const badge = document.getElementById("cart-badge-count");
+  const drawerCount = document.getElementById("cart-drawer-count");
+  const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
+  if (badge) badge.innerText = totalCount;
+  if (drawerCount) drawerCount.innerText = totalCount;
+  renderCartItems();
+};
+
+const renderCartItems = () => {
+  const container = document.getElementById("cart-items-container");
+  const subtotalText = document.getElementById("cart-subtotal");
+  const footerDetails = document.getElementById("cart-footer-details");
+  if (!container) return;
+
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="empty-cart-message">
+        <p>Your shopping cart is empty.</p>
+        <a href="#products" class="btn btn-primary" id="empty-cart-shop-btn">Browse Shop</a>
+      </div>
+    `;
+    if (subtotalText) subtotalText.innerText = "₹0.00";
+    if (footerDetails) footerDetails.style.display = "none";
+    
+    // Add close trigger to Browse Shop inside cart
+    const browseBtn = document.getElementById("empty-cart-shop-btn");
+    if (browseBtn) {
+      browseBtn.addEventListener("click", closeCartDrawer);
+    }
+    return;
+  }
+
+  if (footerDetails) footerDetails.style.display = "flex";
+  
+  let subtotal = 0;
+  container.innerHTML = cart.map(item => {
+    subtotal += item.price * item.qty;
+    return `
+      <div class="cart-item">
+        <img class="cart-item-img" src="${item.image}" alt="${item.name}">
+        <div class="cart-item-details">
+          <div>
+            <h4 class="cart-item-name">${item.name}</h4>
+            <span class="cart-item-price">₹${item.price}</span>
+          </div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="updateCartQty('${item.id}', ${item.qty - 1})">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="updateCartQty('${item.id}', ${item.qty + 1})">+</button>
+            <button class="cart-item-remove" style="margin-left:auto;" onclick="updateCartQty('${item.id}', 0)">Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  if (subtotalText) subtotalText.innerText = `₹${subtotal}`;
+};
+
+// Make updateCartQty global so inline onclick works
+window.updateCartQty = updateCartQty;
+
+// Cart Drawer open/close
+const openCartDrawer = () => {
+  const drawer = document.getElementById("cart-drawer");
+  if (drawer) drawer.classList.add("open");
+};
+
+const closeCartDrawer = () => {
+  const drawer = document.getElementById("cart-drawer");
+  if (drawer) drawer.classList.remove("open");
+};
+
+// ==========================================================================
+// RENDER CLIENT VIEWS
+// ==========================================================================
+
+// A. Product Details Page View
+const renderProductDetails = (container, productId) => {
+  const product = products.find(p => p.id === productId);
+  if (!product) {
+    container.innerHTML = `<div class="container section text-center"><h2>Remedy Not Found</h2><a href="#products" class="btn btn-primary">Back to Shop</a></div>`;
+    return;
+  }
+
+  // Calculate discount percentage
+  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+
+  container.innerHTML = `
+    <section class="section" style="padding-top: 40px;">
+      <div class="container">
+        <div class="about-grid">
+          <!-- Product Left Image -->
+          <div class="hero-featured-wrapper" style="background-color: var(--primary-ultra-light); padding: 40px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+            <img src="${product.image}" alt="${product.name}" style="max-height: 380px; object-fit: contain; width: 100%; max-width: 320px; filter: drop-shadow(0 15px 25px rgba(11,61,51,0.15));">
+          </div>
+          
+          <!-- Product Right Details -->
+          <div class="about-text">
+            <span class="badge" style="margin-bottom: 12px; background-color: ${product.stock <= 0 ? 'var(--danger)' : 'var(--primary-ultra-light)'}; color: ${product.stock <= 0 ? 'white' : 'var(--primary)'}">
+              ${product.stock <= 0 ? 'Out of Stock' : product.stock < 10 ? `Low Stock (Only ${product.stock} left!)` : 'In Stock'}
+            </span>
+            <h2 style="font-size: 2.2rem; line-height: 1.2; margin-bottom: 8px; color: var(--primary); text-align: left;">${product.name}</h2>
+            
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+              <span style="color: var(--accent); font-weight: bold; font-size: 1.1rem;">★★★★★</span>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">(4.9 Clinical Rating from 120+ Patients)</span>
+            </div>
+
+            <p style="font-size: 1.05rem; margin-bottom: 24px; color: var(--text-muted);">${product.description}</p>
+            
+            <div style="background-color: var(--primary-ultra-light); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 20px; display: inline-flex; flex-direction: column; min-width: 250px; margin-bottom: 30px;">
+              <div style="display: flex; align-items: baseline; gap: 12px;">
+                <span style="font-size: 2.2rem; font-weight: 700; color: var(--primary);">₹${product.price}</span>
+                <span style="text-decoration: line-through; color: var(--text-muted); font-size: 1.1rem;">₹${product.originalPrice}</span>
+                <span class="badge" style="background-color: var(--accent); color: white; border: none; font-size: 0.75rem;">Save ${discount}%</span>
+              </div>
+              <small style="color: var(--text-muted); margin-top: 4px;">Free Shipping & Cash on Delivery</small>
+            </div>
+
+            <!-- Buy Buttons -->
+            <div style="display: flex; gap: 16px; margin-bottom: 30px; flex-wrap: wrap;">
+              <div class="cart-item-qty" style="border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius); background-color: var(--surface); display: flex; align-items: center; gap: 16px; height: 50px;">
+                <span style="font-weight: 600; font-size: 0.9rem;">Quantity:</span>
+                <button class="qty-btn" id="det-qty-minus" style="width: 28px; height: 28px;">-</button>
+                <strong id="det-qty-val">1</strong>
+                <button class="qty-btn" id="det-qty-plus" style="width: 28px; height: 28px;">+</button>
+              </div>
+              
+              <button class="btn btn-primary" id="det-add-cart-btn" style="height: 50px; flex: 1; min-width: 160px;">Add to Cart</button>
+              <button class="btn btn-whatsapp" id="det-buy-wa-btn" style="height: 50px; flex: 1; min-width: 200px;">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                Buy via WhatsApp
+              </button>
+            </div>
+
+            <!-- Highlights -->
+            <div>
+              <h3 style="font-size: 1.15rem; margin-bottom: 12px; color: var(--primary);">Key Highlights:</h3>
+              <ul style="display: flex; flex-direction: column; gap: 8px;">
+                ${product.highlights.map(hl => `<li style="font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;"><span style="color:var(--accent);">✦</span> ${hl}</li>`).join("")}
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+
+  // Detail view quantity button listeners
+  const detQtyVal = document.getElementById("det-qty-val");
+  const minus = document.getElementById("det-qty-minus");
+  const plus = document.getElementById("det-qty-plus");
+  const addCart = document.getElementById("det-add-cart-btn");
+  const buyWa = document.getElementById("det-buy-wa-btn");
+
+  let currentQty = 1;
+  minus.addEventListener("click", () => {
+    if (currentQty > 1) {
+      currentQty--;
+      detQtyVal.innerText = currentQty;
+    }
+  });
+  plus.addEventListener("click", () => {
+    if (currentQty < product.stock) {
+      currentQty++;
+      detQtyVal.innerText = currentQty;
+    } else {
+      alert(`Only ${product.stock} units are currently in stock.`);
+    }
+  });
+
+  addCart.addEventListener("click", () => {
+    addToCart(product.id, currentQty);
+  });
+
+  buyWa.addEventListener("click", () => {
+    const textMsg = encodeURIComponent(
+      `Hello Unani Dawakhana Official, I would like to order:\n\n` +
+      `- *${product.name}* (Qty: ${currentQty})\n` +
+      `Total Price: ₹${product.price * currentQty}\n\n` +
+      `Please confirm my order and shipping details. Thank you!`
+    );
+    window.open(`https://wa.me/918796982661?text=${textMsg}`, "_blank");
+  });
+};
+
+// B. General Home Page View
+const renderHomeView = (container) => {
+  container.innerHTML = `
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="container hero-container">
+        <div class="hero-content">
+          <span class="hero-tagline">🌿 Premium Herbal Healing</span>
+          <h1>Natural Clinically Proven Unani & Ayurvedic Wellness</h1>
+          <p class="hero-desc">Experience luxury organic healthcare formulations and professional, non-invasive therapeutic treatments designed for lasting wellness. Consultation by expert herbal doctors.</p>
+          <div class="hero-actions">
+            <a href="#appointment" class="btn btn-primary">Book Appointment</a>
+            <a href="https://wa.me/918796982661" target="_blank" class="btn btn-secondary">WhatsApp Doctor</a>
+          </div>
+        </div>
+        <div class="hero-featured-wrapper">
+          <img class="hero-featured-img" src="assets/badshahi_nuksa.png" alt="Featured Herbals">
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section with Stats -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-img-wrapper" style="border-radius: var(--radius-lg); overflow:hidden; border: 1px solid var(--border);">
+            <img src="assets/badshahi_safuf.png" alt="Clinical Herbal Lab" style="width:100%; height:380px; object-fit:cover;">
+          </div>
+          <div class="about-text">
+            <h3>Pioneering Natural Herbal Medicine</h3>
+            <p style="color:var(--text-muted); margin-bottom: 16px;">At Unani Dawakhana Official, we combine centuries-old Unani and Ayurvedic clinical wisdom with modern purification standards to manufacture and prescribe premium organic formulations. We focus on healing chronic diseases at their roots naturally, without chemical side effects.</p>
+            <p style="color:var(--text-muted); margin-bottom: 24px;">Our clinics are staffed by licensed BUMS doctors who offer personalized diagnostic evaluations, custom dietary charts, and detox therapies like Hijama to restore the body's natural elemental balance.</p>
+            
+            <!-- Statistics Counters -->
+            <div class="about-stats">
+              <div class="stat-card">
+                <div class="stat-number">15K+</div>
+                <div class="stat-label">Happy Patients</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">25+</div>
+                <div class="stat-label">Remedy Formulas</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">12+</div>
+                <div class="stat-label">Years of Vigor</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Treatments Grid -->
+    <section class="section glass-section" id="treatments">
+      <div class="container">
+        <div class="section-header">
+          <h2>Specialized Natural Treatments</h2>
+          <p>We provide personalized clinical therapies for chronic health conditions using premium organic oils, powders, and purification procedures.</p>
+        </div>
+        <div class="treatments-grid">
+          <!-- Stomach Problems -->
+          <div class="treatment-card">
+            <span class="treatment-icon">🍃</span>
+            <h3>Stomach Problems</h3>
+            <p>Treat chronic acidity, constipation, indigestion, gas, and metabolic sluggishness with traditional natural cleansers.</p>
+          </div>
+          <!-- Joint Pain -->
+          <div class="treatment-card">
+            <span class="treatment-icon">🦴</span>
+            <h3>Joint & Muscular Pain</h3>
+            <p>Relieve joint inflammation, sciatica discomfort, arthritis strain, and back pains using targeted Roghan hot oil therapies.</p>
+          </div>
+          <!-- Skin Problems -->
+          <div class="treatment-card">
+            <span class="treatment-icon">✨</span>
+            <h3>Skin & Allergy Care</h3>
+            <p>Heal eczema, acne flareups, skin dry patches, and blood toxicity at the source with cooling internal blood purifiers.</p>
+          </div>
+          <!-- Weakness -->
+          <div class="treatment-card">
+            <span class="treatment-icon">⚡</span>
+            <h3>Vigor & Stamina Recovery</h3>
+            <p>Restore cellular energy levels, stamina, daily focus, and nervous system strength using clinical Shilajit and Saffron blends.</p>
+          </div>
+          <!-- Hair Problems -->
+          <div class="treatment-card">
+            <span class="treatment-icon">💆</span>
+            <h3>Hair & Scalp Disorders</h3>
+            <p>Address scalp dandruff, dry hair roots, and hair fall utilizing active herbal oils infused with organic Brahmi and Amla extracts.</p>
+          </div>
+          <!-- Hijama Therapy -->
+          <div class="treatment-card">
+            <span class="treatment-icon">🩸</span>
+            <h3>Hijama Therapy (Wet Cupping)</h3>
+            <p>Remove heavy metal toxins, stimulate blood circulation, and relieve chronic pains with hygienic, clinical wet cupping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Catalog Section -->
+    <section class="section" id="products">
+      <div class="container">
+        <div class="section-header">
+          <h2>Our Herbal Formulations</h2>
+          <p>Explore our premium clinical preparations. Prepared in strict adherence to GMP standards. We ship across India with COD options.</p>
+        </div>
+
+        <!-- Shop Filters and Search Bar -->
+        <div class="shop-filter-controls" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; background-color: var(--primary-ultra-light); padding: 16px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+          <div class="category-filters" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-outline filter-tag ${storeActiveCategory === 'All' ? 'active' : ''}" style="padding: 6px 16px; font-size: 0.8rem; height: 36px;" onclick="setStoreCategory('All')">All</button>
+            <button class="btn btn-outline filter-tag ${storeActiveCategory === 'Stamina & Vigor' ? 'active' : ''}" style="padding: 6px 16px; font-size: 0.8rem; height: 36px;" onclick="setStoreCategory('Stamina & Vigor')">Stamina & Vigor</button>
+            <button class="btn btn-outline filter-tag ${storeActiveCategory === 'Hair Care' ? 'active' : ''}" style="padding: 6px 16px; font-size: 0.8rem; height: 36px;" onclick="setStoreCategory('Hair Care')">Hair Care</button>
+            <button class="btn btn-outline filter-tag ${storeActiveCategory === 'Stomach Care' ? 'active' : ''}" style="padding: 6px 16px; font-size: 0.8rem; height: 36px;" onclick="setStoreCategory('Stomach Care')">Stomach Care</button>
+            <button class="btn btn-outline filter-tag ${storeActiveCategory === 'Oils & Massages' ? 'active' : ''}" style="padding: 6px 16px; font-size: 0.8rem; height: 36px;" onclick="setStoreCategory('Oils & Massages')">Oils & Massages</button>
+          </div>
+          <div class="shop-search-wrapper" style="position: relative; width: 100%; max-width: 320px;">
+            <input type="text" class="admin-search-input" style="width: 100%; padding: 8px 16px 8px 40px; font-size: 0.85rem; height: 36px;" placeholder="Search remedy..." value="${storeSearchQuery}" oninput="handleShopSearch(this.value)">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem;">🔍</span>
+          </div>
+        </div>
+
+        <div class="products-showcase-grid" id="products-grid-container">
+          <!-- Dynamic Products Rendered Here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Appointment Form -->
+    <section class="section glass-section" id="appointment">
+      <div class="container">
+        <div class="appointment-layout">
+          <div style="display:flex; flex-direction:column; justify-content:center;">
+            <h2 style="font-size: 2.4rem; color: var(--primary); margin-bottom: 16px;">Schedule a Clinical Consultation</h2>
+            <p style="color:var(--text-muted); margin-bottom: 24px; max-width:480px;">Meet our qualified Unani BUMS doctors at our Shaheen Bagh clinic or book a direct phone consultation call. Submit your symptoms and preferred time below to confirm your slots.</p>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="display:flex; align-items:center; gap:12px; font-weight:600; color:var(--primary);"><span style="color:var(--accent);">✓</span> Personalized Dietary Recommendations</div>
+              <div style="display:flex; align-items:center; gap:12px; font-weight:600; color:var(--primary);"><span style="color:var(--accent);">✓</span> 100% Confidential Health Audits</div>
+              <div style="display:flex; align-items:center; gap:12px; font-weight:600; color:var(--primary);"><span style="color:var(--accent);">✓</span> Safe, Non-Chemical Botanical Therapies</div>
+            </div>
+          </div>
+          <div class="appointment-form-box">
+            <h3 style="color:var(--primary); margin-bottom: 20px;">Book Consultation</h3>
+            <form id="appointment-booking-form" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="form-group">
+                <label for="apt-name">Your Full Name *</label>
+                <input type="text" id="apt-name" required placeholder="Enter full name">
+              </div>
+              <div class="form-group">
+                <label for="apt-phone">WhatsApp / Phone Number *</label>
+                <input type="tel" id="apt-phone" required placeholder="Enter mobile number">
+              </div>
+              <div class="form-group">
+                <label for="apt-symptoms">Describe Symptoms / Problems *</label>
+                <textarea id="apt-symptoms" required placeholder="E.g., Joint pain, digestion issue, hair thinning..." rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="apt-time">Preferred Consultation Date & Time *</label>
+                <input type="datetime-local" id="apt-time" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full" style="margin-top: 10px;">Submit Appointment Request</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Slider -->
+    <section class="section" id="testimonials">
+      <div class="container">
+        <div class="section-header">
+          <h2>Patient Success Stories</h2>
+          <p>Read honest reviews from patients who successfully healed chronic joint pains, hair fall, and digestive issues.</p>
+        </div>
+        <div class="testimonials-slider">
+          <div class="testimonial-card">
+            <span style="color: var(--accent); font-size: 1.5rem;">“</span>
+            <p style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">My chronic indigestion and stomach acidity disappeared completely within 3 weeks of taking Badshahi Safuf. Extremely professional doctors at Shaheen Bagh clinic.</p>
+            <div class="user-info">
+              <div class="user-avatar">K</div>
+              <div>
+                <h4 style="font-size:0.9rem;">Kamlesh Verma</h4>
+                <small style="color:var(--text-muted);">Acidity Patient</small>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <span style="color: var(--accent); font-size: 1.5rem;">“</span>
+            <p style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">The Roghan oil blend worked wonders on my mother's chronic knee arthritis pain. She is able to walk comfortably now. Highly recommended herbal medicine!</p>
+            <div class="user-info">
+              <div class="user-avatar">M</div>
+              <div>
+                <h4 style="font-size:0.9rem;">Mohit Mishra</h4>
+                <small style="color:var(--text-muted);">Joint Pain Client</small>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <span style="color: var(--accent); font-size: 1.5rem;">“</span>
+            <p style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">My hair thinning and severe scalp dandruff stopped in less than a month of using the Kesh hair oil and herbal shampoo combo. Safe and clean formulas.</p>
+            <div class="user-info">
+              <div class="user-avatar">P</div>
+              <div>
+                <h4 style="font-size:0.9rem;">Pragati Sen</h4>
+                <small style="color:var(--text-muted);">Hair Loss Treatment</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Accordion Section -->
+    <section class="section glass-section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <h2>Frequently Asked Questions</h2>
+          <p>Common questions about our traditional Unani treatments, organic formulations, and clinical consultations.</p>
+        </div>
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+          <div class="faq-item" style="background-color: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <button class="faq-question" style="width: 100%; padding: 20px 24px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; color: var(--primary); font-family: var(--font-heading);" onclick="toggleFaq(this)">
+              <span>What is Unani Medicine and how does it work?</span>
+              <span class="faq-arrow" style="font-size: 0.8rem; transition: var(--transition); color: var(--accent);">▼</span>
+            </button>
+            <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 24px;">
+              <p style="padding-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Unani medicine is a traditional system of healing based on the teachings of Hippocrates and Galen, refined by Arab and Persian scholars like Avicenna. It focuses on the balance of four humors (blood, phlegm, yellow bile, and black bile) and uses 100% natural, plant-based remedies to restore health at its root without chemical side effects.</p>
+            </div>
+          </div>
+          <div class="faq-item" style="background-color: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <button class="faq-question" style="width: 100%; padding: 20px 24px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; color: var(--primary); font-family: var(--font-heading);" onclick="toggleFaq(this)">
+              <span>Are these formulations AYUSH and GMP certified?</span>
+              <span class="faq-arrow" style="font-size: 0.8rem; transition: var(--transition); color: var(--accent);">▼</span>
+            </button>
+            <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 24px;">
+              <p style="padding-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Yes, all our clinical formulations are prepared in facilities meeting strict GMP (Good Manufacturing Practices) guidelines and are AYUSH certified. We ensure maximum organic purity and clinical efficacy in every batch.</p>
+            </div>
+          </div>
+          <div class="faq-item" style="background-color: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <button class="faq-question" style="width: 100%; padding: 20px 24px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; color: var(--primary); font-family: var(--font-heading);" onclick="toggleFaq(this)">
+              <span>How can I book an appointment with the doctor?</span>
+              <span class="faq-arrow" style="font-size: 0.8rem; transition: var(--transition); color: var(--accent);">▼</span>
+            </button>
+            <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 24px;">
+              <p style="padding-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">You can book an appointment directly through our online consultation form on this website or by sending us a message on our WhatsApp helpline (+91 8796982661). Walk-ins are also welcome at our Shaheen Bagh, New Delhi clinic.</p>
+            </div>
+          </div>
+          <div class="faq-item" style="background-color: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <button class="faq-question" style="width: 100%; padding: 20px 24px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; color: var(--primary); font-family: var(--font-heading);" onclick="toggleFaq(this)">
+              <span>Do you provide Cash on Delivery (COD) across India?</span>
+              <span class="faq-arrow" style="font-size: 0.8rem; transition: var(--transition); color: var(--accent);">▼</span>
+            </button>
+            <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 24px;">
+              <p style="padding-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Yes! We offer free delivery and Cash on Delivery (COD) services across India. You only pay for your remedies when they reach your doorstep.</p>
+            </div>
+          </div>
+          <div class="faq-item" style="background-color: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <button class="faq-question" style="width: 100%; padding: 20px 24px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; color: var(--primary); font-family: var(--font-heading);" onclick="toggleFaq(this)">
+              <span>How long does it take to see results with Unani treatments?</span>
+              <span class="faq-arrow" style="font-size: 0.8rem; transition: var(--transition); color: var(--accent);">▼</span>
+            </button>
+            <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 24px;">
+              <p style="padding-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Unani medicine works by repairing the body's self-healing mechanisms. While symptoms like stomach acidity or fatigue show improvement in 7 to 10 days, chronic joint pain or hair root recovery may take 3 to 6 weeks of consistent treatment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Map Section -->
+    <section class="section glass-section" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2>Contact Our Wellness Clinic</h2>
+          <p>Get in touch or visit our clinic. Walk-ins and phone consultations are welcome.</p>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-cards-list">
+            <div class="contact-card-item">
+              <span class="contact-card-icon">📍</span>
+              <div>
+                <h4 style="color:var(--primary); font-size:1.05rem;">Clinic Address</h4>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Shaheen Bagh, Okhla, Jamia Nagar, New Delhi - 110025</p>
+              </div>
+            </div>
+            <div class="contact-card-item">
+              <span class="contact-card-icon">📞</span>
+              <div>
+                <h4 style="color:var(--primary); font-size:1.05rem;">Phone & WhatsApp Helpline</h4>
+                <p style="color:var(--text-muted); font-size:0.9rem;">+91 8796982661</p>
+              </div>
+            </div>
+            <div class="contact-card-item">
+              <span class="contact-card-icon">✉️</span>
+              <div>
+                <h4 style="color:var(--primary); font-size:1.05rem;">Official Email</h4>
+                <p style="color:var(--text-muted); font-size:0.9rem;">ounanidawakhana@gmail.com</p>
+              </div>
+            </div>
+          </div>
+          <div class="map-placeholder">
+            <span style="font-size: 2.2rem; margin-bottom: 8px;">🗺️</span>
+            <h4 style="color:var(--primary);">Okhla Clinic Location</h4>
+            <p style="color:var(--text-muted); font-size: 0.85rem; max-width: 320px; text-align: center; margin-top: 4px;">Shaheen Bagh Main Market Road, adjacent to Jamia Nagar Police Station, Okhla, New Delhi.</p>
+            <a href="https://wa.me/918796982661" target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 16px; padding: 8px 16px;">Navigate on Map</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+
+  renderProductsGrid();
+
+  // Bind home page form submit listeners
+  const aptForm = document.getElementById("appointment-booking-form");
+  if (aptForm) {
+    aptForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("apt-name").value;
+      const phone = document.getElementById("apt-phone").value;
+      const symptoms = document.getElementById("apt-symptoms").value;
+      const time = document.getElementById("apt-time").value;
+
+      if (!/^\d{10}$/.test(phone.trim())) {
+        alert("Please enter a valid 10-digit mobile number.");
+        return;
+      }
+
+      // Save appointment
+      fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, date: new Date().toISOString().split("T")[0], time, concern: symptoms })
+      }).then(res => res.json()).then(data => {
+        if(data.success) {
+          const newApt = {
+            id: `APT-${data.id}`,
+            date: new Date().toISOString().split("T")[0],
+            name: name,
+            phone: phone,
+            symptoms: symptoms,
+            time: time,
+            status: "Pending"
+          };
+          appointments.push(newApt);
+          saveAppointmentsState();
+        }
+      }).catch(err => console.error(err));
+      
+      // Clear form
+      aptForm.reset();
+
+      // Show success
+      showSuccessPopup("Appointment Booked!", `Your clinic slot registration request has been submitted. We will contact you at ${phone} to confirm.`);
+    });
+  }
+};
+
+// Shop dynamic filter/search functions
+const renderProductsGrid = () => {
+  const container = document.getElementById("products-grid-container");
+  if (!container) return;
+
+  let filtered = products;
+  if (storeActiveCategory !== "All") {
+    filtered = filtered.filter(p => p.category === storeActiveCategory);
+  }
+  if (storeSearchQuery.trim() !== "") {
+    const q = storeSearchQuery.toLowerCase().trim();
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: span 3; text-align: center; padding: 40px; color: var(--text-muted);">
+        <span style="font-size: 3rem;">🌿</span>
+        <h3 style="margin-top: 10px; color: var(--primary);">No Remedies Found</h3>
+        <p style="font-size: 0.9rem; margin-top: 4px;">Try searching for other keywords or select a different category.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => `
+    <div class="product-card fade-in">
+      <div class="product-img-box">
+        <img class="product-img" src="${p.image}" alt="${p.name}">
+      </div>
+      <div class="product-info">
+        <span class="product-category" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block;">${p.category}</span>
+        <h3 class="product-title">${p.name}</h3>
+        <p class="product-desc">${p.description}</p>
+        <div class="product-footer">
+          <span class="product-price">₹${p.price}</span>
+          <div class="product-actions">
+            <a href="#product/${p.id}" class="action-btn-sm btn-outline" title="View Details">👁</a>
+            <button class="action-btn-sm btn-primary" onclick="addToCart('${p.id}', 1)" title="Add to Cart">🛒</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+};
+window.renderProductsGrid = renderProductsGrid;
+
+const setStoreCategory = (category) => {
+  storeActiveCategory = category;
+  
+  // Highlight active tab
+  document.querySelectorAll(".filter-tag").forEach(btn => {
+    btn.classList.remove("active");
+    if (btn.innerText.trim().toLowerCase() === category.toLowerCase()) {
+      btn.classList.add("active");
+    }
+  });
+
+  renderProductsGrid();
+};
+window.setStoreCategory = setStoreCategory;
+
+const handleShopSearch = (val) => {
+  storeSearchQuery = val;
+  renderProductsGrid();
+};
+window.handleShopSearch = handleShopSearch;
+
+// FAQ accordion toggler
+const toggleFaq = (btn) => {
+  const item = btn.parentElement;
+  const answer = item.querySelector(".faq-answer");
+  const arrow = item.querySelector(".faq-arrow");
+  const isAlreadyOpen = item.classList.contains("open");
+
+  // Close all other accordions first
+  document.querySelectorAll(".faq-item").forEach(el => {
+    el.classList.remove("open");
+    const ans = el.querySelector(".faq-answer");
+    if (ans) ans.style.maxHeight = null;
+    const arr = el.querySelector(".faq-arrow");
+    if (arr) arr.style.transform = "rotate(0deg)";
+  });
+
+  if (!isAlreadyOpen) {
+    item.classList.add("open");
+    answer.style.maxHeight = answer.scrollHeight + "px";
+    arrow.style.transform = "rotate(180deg)";
+  } else {
+    answer.style.maxHeight = null;
+    arrow.style.transform = "rotate(0deg)";
+  }
+};
+window.toggleFaq = toggleFaq;
+
+// Make addToCart globally accessible
+window.addToCart = addToCart;
+
+// ==========================================================================
+// ADVANCED OWNER ADMIN DASHBOARD RENDERER
+// ==========================================================================
+const renderAdminDashboard = (container) => {
+  container.innerHTML = `
+    <div class="admin-dashboard-container">
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <h2>Owner Portal</h2>
+          <span>Unani Dawakhana</span>
+        </div>
+        <nav class="admin-nav">
+          <button class="admin-nav-item ${adminActiveTab === 'dashboard' ? 'active' : ''}" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+          <button class="admin-nav-item ${adminActiveTab === 'orders' ? 'active' : ''}" onclick="switchAdminTab('orders')">📦 Order Manager</button>
+          <button class="admin-nav-item ${adminActiveTab === 'products' ? 'active' : ''}" onclick="switchAdminTab('products')">🌿 Product Stock</button>
+          <button class="admin-nav-item ${adminActiveTab === 'appointments' ? 'active' : ''}" onclick="switchAdminTab('appointments')">📅 Appointments</button>
+        </nav>
+        <div class="admin-sidebar-footer" style="display: flex; flex-direction: column; gap: 8px; padding: 0 16px;">
+          <button onclick="adminLogout()" class="btn btn-outline btn-full" style="color: white; border-color: var(--danger); background-color: rgba(239, 68, 68, 0.15); font-size: 0.8rem; padding: 8px 16px;">🔒 Log Out</button>
+          <a href="#home" class="btn btn-outline btn-full" style="color: white; border-color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; padding: 8px 16px;">← Exit Shop</a>
+        </div>
+      </aside>
+
+      <!-- Main Panel area -->
+      <div class="admin-main-content">
+        <!-- Header status bar -->
+        <header class="admin-header-bar">
+          <div class="admin-header-title">
+            <h1 id="admin-panel-title-text">Dashboard Analytics</h1>
+          </div>
+          <div class="admin-header-meta">
+            <span>🛡️ Owner Authenticated</span>
+            <span>Date: ${new Date().toISOString().split("T")[0]}</span>
+          </div>
+        </header>
+
+        <!-- Body Render Target -->
+        <div class="admin-body" id="admin-dashboard-body">
+          <!-- Dynamic Content -->
+        </div>
+      </div>
+    </div>
+  `;
+
+  renderAdminTabContent();
+};
+
+const switchAdminTab = (tabId) => {
+  adminActiveTab = tabId;
+  const titleText = document.getElementById("admin-panel-title-text");
+  if (titleText) {
+    if (tabId === 'dashboard') titleText.innerText = "Dashboard Analytics";
+    if (tabId === 'orders') titleText.innerText = "Order & Returns Tracker";
+    if (tabId === 'products') titleText.innerText = "Product Inventory Control";
+    if (tabId === 'appointments') titleText.innerText = "Consultation Appointments";
+  }
+
+  // Update menu highlight
+  document.querySelectorAll(".admin-nav-item").forEach(item => {
+    item.classList.remove("active");
+  });
+  // Re-run parent view to update sidebar highlights if needed, or update dynamically
+  const buttons = document.querySelectorAll(".admin-nav-item");
+  if (tabId === 'dashboard') buttons[0].classList.add("active");
+  if (tabId === 'orders') buttons[1].classList.add("active");
+  if (tabId === 'products') buttons[2].classList.add("active");
+  if (tabId === 'appointments') buttons[3].classList.add("active");
+
+  renderAdminTabContent();
+};
+window.switchAdminTab = switchAdminTab;
+
+const renderAdminTabContent = () => {
+  const container = document.getElementById("admin-dashboard-body");
+  if (!container) return;
+
+  if (adminActiveTab === "dashboard") {
+    // Calculate total values
+    const totalOrders = orders.length;
+    const pendingOrders = orders.filter(o => o.status === "New Order" || o.status === "Packing" || o.status === "Confirmed").length;
+    const shippedOrders = orders.filter(o => o.status === "Shipped" || o.status === "Out For Delivery").length;
+    const deliveredOrders = orders.filter(o => o.status === "Delivered").length;
+    const returnedOrders = orders.filter(o => o.status === "Returned").length;
+    const revenue = orders.filter(o => o.status !== "Returned").reduce((acc, o) => acc + o.total, 0);
+
+    // Filter best sellers
+    const sortedBestSellers = [...products].sort((a, b) => b.sold - a.sold).slice(0, 3);
+
+    container.innerHTML = `
+      <!-- Top Analytics Grid -->
+      <div class="admin-analytics-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Total Orders</h3>
+            <span class="admin-stat-number">${totalOrders}</span>
+          </div>
+          <span class="admin-stat-icon">📦</span>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Revenue (Non-Return)</h3>
+            <span class="admin-stat-number">₹${revenue}</span>
+          </div>
+          <span class="admin-stat-icon">💰</span>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Active Shipments</h3>
+            <span class="admin-stat-number">${shippedOrders + pendingOrders}</span>
+          </div>
+          <span class="admin-stat-icon">🚚</span>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Return Rate</h3>
+            <span class="admin-stat-number">${totalOrders > 0 ? Math.round((returnedOrders / totalOrders) * 100) : 0}%</span>
+          </div>
+          <span class="admin-stat-icon">🔄</span>
+        </div>
+      </div>
+
+      <!-- Split details panels -->
+      <div class="admin-split-layout">
+        <!-- Best selling -->
+        <div class="admin-card-panel">
+          <h3>Best Selling Herbal Remedies</h3>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Units Sold</th>
+                  <th>Rem. Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sortedBestSellers.map(p => `
+                  <tr>
+                    <td><strong>${p.name}</strong></td>
+                    <td>₹${p.price}</td>
+                    <td><span class="badge" style="background-color: var(--primary-ultra-light); color:var(--primary); font-weight:700;">${p.sold} Units</span></td>
+                    <td>
+                      <span class="badge" style="background-color: ${p.stock <= 5 ? '#fef3c7' : '#d1fae5'}; color: ${p.stock <= 5 ? '#b45309' : '#065f46'};">
+                        ${p.stock} Left
+                      </span>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent orders -->
+        <div class="admin-card-panel">
+          <h3>Today's Recent Orders</h3>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Total Payable</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.slice(-4).reverse().map(o => `
+                  <tr>
+                    <td><strong>${o.name}</strong><br><small>${o.phone}</small></td>
+                    <td>₹${o.total}</td>
+                    <td><span class="status-pill ${o.status.toLowerCase().replace(" ", "-")}">${o.status}</span></td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+  } 
+  
+  else if (adminActiveTab === "orders") {
+    // Filtered orders list
+    let filteredOrders = orders;
+    if (orderFilterStatus !== "All") {
+      filteredOrders = filteredOrders.filter(o => o.status === orderFilterStatus);
+    }
+    if (orderSearchQuery.trim() !== "") {
+      const q = orderSearchQuery.toLowerCase();
+      filteredOrders = filteredOrders.filter(o => o.name.toLowerCase().includes(q) || o.phone.includes(q) || o.productName.toLowerCase().includes(q));
+    }
+
+    container.innerHTML = `
+      <div class="admin-card-panel">
+        <div class="admin-filter-bar">
+          <div style="display:flex; gap:12px;">
+            <input type="text" class="admin-search-input" id="order-search" placeholder="Search by customer name/phone..." value="${orderSearchQuery}">
+            <select class="admin-search-input" id="order-status-filter" style="width:180px;">
+              <option value="All" ${orderFilterStatus === 'All' ? 'selected' : ''}>All Order Statuses</option>
+              <option value="New Order" ${orderFilterStatus === 'New Order' ? 'selected' : ''}>New Order</option>
+              <option value="Confirmed" ${orderFilterStatus === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="Packing" ${orderFilterStatus === 'Packing' ? 'selected' : ''}>Packing</option>
+              <option value="Shipped" ${orderFilterStatus === 'Shipped' ? 'selected' : ''}>Shipped</option>
+              <option value="Out For Delivery" ${orderFilterStatus === 'Out For Delivery' ? 'selected' : ''}>Out For Delivery</option>
+              <option value="Delivered" ${orderFilterStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+              <option value="Returned" ${orderFilterStatus === 'Returned' ? 'selected' : ''}>Returned</option>
+            </select>
+          </div>
+          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Showing ${filteredOrders.length} Orders</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Order Date</th>
+                <th>Patient Details</th>
+                <th>Products Booked</th>
+                <th>Total</th>
+                <th>Order Status</th>
+                <th>Payment Mode</th>
+                <th>Quick Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredOrders.map(o => `
+                <tr>
+                  <td><strong>${o.id}</strong></td>
+                  <td>${o.date}</td>
+                  <td>
+                    <strong>${o.name}</strong><br>
+                    <small>${o.phone}</small><br>
+                    <small style="color:var(--text-muted);">${o.address}, ${o.city} - ${o.pincode}</small>
+                  </td>
+                  <td>${o.productName}</td>
+                  <td><strong>₹${o.total}</strong></td>
+                  <td>
+                    <select class="status-selector" style="border:1px solid var(--border); padding:4px 8px; border-radius:var(--radius-sm); font-size:0.75rem; font-weight:600;" onchange="changeOrderStatus('${o.id}', this.value)">
+                      <option value="New Order" ${o.status === 'New Order' ? 'selected' : ''}>New Order</option>
+                      <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                      <option value="Packing" ${o.status === 'Packing' ? 'selected' : ''}>Packing</option>
+                      <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                      <option value="Out For Delivery" ${o.status === 'Out For Delivery' ? 'selected' : ''}>Out For Delivery</option>
+                      <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                      <option value="Returned" ${o.status === 'Returned' ? 'selected' : ''}>Returned</option>
+                    </select>
+                  </td>
+                  <td>
+                    <span class="status-pill ${o.paymentStatus === 'Paid' ? 'delivered' : 'pending'}">${o.paymentStatus}</span>
+                  </td>
+                  <td>
+                    <div class="admin-action-buttons">
+                      <button class="admin-btn-action info" onclick="viewInvoice('${o.id}')">📄 Invoice</button>
+                      ${o.status !== 'Delivered' && o.status !== 'Returned' ? `<button class="admin-btn-action success" onclick="confirmDelivery('${o.id}')">✓ Deliver</button>` : ''}
+                      <button class="admin-btn-action danger" onclick="deleteOrder('${o.id}')">🗑 Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    // Bind filters
+    const search = document.getElementById("order-search");
+    const statusSelect = document.getElementById("order-status-filter");
+    search.addEventListener("input", (e) => {
+      orderSearchQuery = e.target.value;
+      renderAdminTabContent();
+    });
+    statusSelect.addEventListener("change", (e) => {
+      orderFilterStatus = e.target.value;
+      renderAdminTabContent();
+    });
+  } 
+  
+  else if (adminActiveTab === "products") {
+    // Show low stock warning if any
+    const lowStockRemedies = products.filter(p => p.stock <= 5);
+
+    container.innerHTML = `
+      ${lowStockRemedies.length > 0 ? `
+        <div class="stock-warning-banner">
+          ⚠️ <strong>Low Stock Alert:</strong> The following remedies are running low: 
+          ${lowStockRemedies.map(p => `<strong>${p.name} (${p.stock} left)</strong>`).join(", ")}. Please restock immediately.
+        </div>
+      ` : ''}
+
+      <div class="admin-split-layout" style="margin-top: 0;">
+        <!-- Products list -->
+        <div class="admin-card-panel" style="grid-column: span 2;">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            Inventory Stocks CRUD
+            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.75rem;" onclick="toggleAddProductForm()">+ Add New Product</button>
+          </h3>
+
+          <!-- Inline Add/Edit Form -->
+          <div id="product-crud-form-container" style="display:none; border:1px dashed var(--accent); padding:20px; border-radius:var(--radius); margin-bottom:20px; background-color:var(--primary-ultra-light);">
+            <h4 id="crud-form-title" style="margin-bottom:12px; color:var(--primary);">Add New Herbal Remedy</h4>
+            <form id="product-crud-form">
+              <input type="hidden" id="crud-prod-id">
+              <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="form-group">
+                  <label for="crud-name">Product Name *</label>
+                  <input type="text" id="crud-name" required placeholder="E.g., Badshahi Powder">
+                </div>
+                <div class="form-group">
+                  <label for="crud-price">Selling Price (₹) *</label>
+                  <input type="number" id="crud-price" required placeholder="999">
+                </div>
+                <div class="form-group">
+                  <label for="crud-orig-price">Original Price (₹) *</label>
+                  <input type="number" id="crud-orig-price" required placeholder="1499">
+                </div>
+                <div class="form-group col-span-2">
+                  <label for="crud-desc">Description *</label>
+                  <input type="text" id="crud-desc" required placeholder="E.g., Organic digestion powder.">
+                </div>
+                <div class="form-group">
+                  <label for="crud-stock">Stock Quantity *</label>
+                  <input type="number" id="crud-stock" required placeholder="15">
+                </div>
+                <div class="form-group col-span-2">
+                  <label for="crud-image">Product Photo (Upload Image) *</label>
+                  <input type="file" id="crud-image" accept="image/*" required onchange="handleImageUpload(event)">
+                  <input type="hidden" id="crud-image-b64">
+                  <img id="crud-image-preview" src="" style="max-height: 120px; display: none; margin-top: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                </div>
+                <div class="form-group">
+                  <label for="crud-highlights">Highlights (Comma Separated)</label>
+                  <input type="text" id="crud-highlights" placeholder="100% natural, GMP certified">
+                </div>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button type="button" class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="toggleAddProductForm()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding:6px 14px; font-size:0.8rem;">Save Product Details</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product Details</th>
+                  <th>Image Path</th>
+                  <th>Price</th>
+                  <th>Original</th>
+                  <th>Current Stock</th>
+                  <th>Sold Qty</th>
+                  <th>Availability Status</th>
+                  <th>Controls</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${products.map(p => `
+                  <tr>
+                    <td><strong>${p.name}</strong><br><small style="color:var(--text-muted);">${p.description.substring(0, 50)}...</small></td>
+                    <td><img src="${p.image}" alt="img" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"></td>
+                    <td>₹${p.price}</td>
+                    <td>₹${p.originalPrice}</td>
+                    <td>
+                      <div style="display:flex; align-items:center; gap:6px;">
+                        <button class="qty-btn" onclick="adjustProductStock('${p.id}', -1)">-</button>
+                        <strong>${p.stock}</strong>
+                        <button class="qty-btn" onclick="adjustProductStock('${p.id}', 1)">+</button>
+                      </div>
+                    </td>
+                    <td>${p.sold}</td>
+                    <td>
+                      <span class="status-pill ${p.stock <= 0 ? 'returned' : p.stock < 10 ? 'confirmed' : 'delivered'}">
+                        ${p.stock <= 0 ? 'Out of Stock' : p.stock < 10 ? 'Low Stock' : 'In Stock'}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="admin-action-buttons">
+                        <button class="admin-btn-action info" onclick="loadEditForm('${p.id}')">✏️ Edit</button>
+                        <button class="admin-btn-action danger" onclick="deleteProduct('${p.id}')">🗑 Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Bind form submit
+    const crudForm = document.getElementById("product-crud-form");
+    if (crudForm) {
+      crudForm.addEventListener("submit", handleProductSave);
+    }
+  } 
+  
+  else if (adminActiveTab === "appointments") {
+    container.innerHTML = `
+      <div class="admin-card-panel">
+        <h3 style="display:flex; justify-content:space-between; align-items:center;">
+          Patient Consultations List
+        </h3>
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Apt ID</th>
+                <th>Patient Details</th>
+                <th>Symptoms / Problems</th>
+                <th>Preferred Time</th>
+                <th>Booking Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appointments.map(a => `
+                <tr>
+                  <td><strong>${a.id}</strong></td>
+                  <td><strong>${a.name}</strong><br><small>${a.phone}</small></td>
+                  <td>${a.symptoms}</td>
+                  <td><code>${a.time.replace("T", " ")}</code></td>
+                  <td>
+                    <span class="status-pill ${a.status === 'Completed' ? 'delivered' : a.status === 'Approved' ? 'shipped' : 'pending'}">
+                      ${a.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="admin-action-buttons">
+                      ${a.status === 'Pending' ? `<button class="admin-btn-action success" onclick="changeAptStatus('${a.id}', 'Approved')">Approve</button>` : ''}
+                      ${a.status === 'Approved' ? `<button class="admin-btn-action info" onclick="changeAptStatus('${a.id}', 'Completed')">Complete</button>` : ''}
+                      <button class="admin-btn-action danger" onclick="deleteApt('${a.id}')">Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+};
+
+// ==========================================================================
+// ADMIN WORKFLOW FUNCTIONS
+// ==========================================================================
+
+const adminLogout = () => {
+  sessionStorage.removeItem("ud_admin_auth");
+  window.location.hash = "#home";
+};
+window.adminLogout = adminLogout;
+
+// Order Status & Delivery Changes
+const changeOrderStatus = (orderId, newStatus) => {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  order.status = newStatus;
+  
+  if (newStatus === "Delivered") {
+    order.paymentStatus = "Paid";
+  }
+  
+  saveOrdersState();
+  renderAdminTabContent();
+};
+window.changeOrderStatus = changeOrderStatus;
+
+const confirmDelivery = (orderId) => {
+  changeOrderStatus(orderId, "Delivered");
+};
+window.confirmDelivery = confirmDelivery;
+
+const deleteOrder = (orderId) => {
+  if (confirm(`Are you sure you want to delete order ${orderId}?`)) {
+    orders = orders.filter(o => o.id !== orderId);
+    saveOrdersState();
+    renderAdminTabContent();
+  }
+};
+window.deleteOrder = deleteOrder;
+
+// Stock Adjustments
+const adjustProductStock = (productId, delta) => {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  
+  product.stock = Math.max(0, product.stock + delta);
+  saveProductsState();
+  renderAdminTabContent();
+};
+window.adjustProductStock = adjustProductStock;
+
+// Delete Product
+const deleteProduct = (productId) => {
+  if (confirm("Are you sure you want to delete this remedy from shop?")) {
+    products = products.filter(p => p.id !== productId);
+    saveProductsState();
+    renderAdminTabContent();
+  }
+};
+window.deleteProduct = deleteProduct;
+
+// Add/Edit Product CRUD
+const toggleAddProductForm = () => {
+  const container = document.getElementById("product-crud-form-container");
+  if (!container) return;
+  
+  if (container.style.display === "none") {
+    container.style.display = "block";
+    document.getElementById("crud-form-title").innerText = "Add New Herbal Remedy";
+    document.getElementById("product-crud-form").reset();
+    document.getElementById("crud-prod-id").value = "";
+  } else {
+    container.style.display = "none";
+  }
+};
+window.toggleAddProductForm = toggleAddProductForm;
+
+const loadEditForm = (productId) => {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  const container = document.getElementById("product-crud-form-container");
+  if (!container) return;
+
+  container.style.display = "block";
+  document.getElementById("crud-form-title").innerText = `Edit: ${product.name}`;
+  
+  document.getElementById("crud-prod-id").value = product.id;
+  document.getElementById("crud-name").value = product.name;
+  document.getElementById("crud-price").value = product.price;
+  document.getElementById("crud-orig-price").value = product.originalPrice;
+  document.getElementById("crud-desc").value = product.description;
+  document.getElementById("crud-stock").value = product.stock;
+  document.getElementById("crud-image").value = ""; // Clear file input
+  
+  document.getElementById("crud-image-b64").value = product.image;
+  const preview = document.getElementById("crud-image-preview");
+  preview.src = product.image;
+  preview.style.display = "block";
+
+  document.getElementById("crud-highlights").value = product.highlights.join(", ");
+};
+window.loadEditForm = loadEditForm;
+
+const handleProductSave = (e) => {
+  e.preventDefault();
+  const idVal = document.getElementById("crud-prod-id").value;
+  const nameVal = document.getElementById("crud-name").value;
+  const priceVal = parseFloat(document.getElementById("crud-price").value);
+  const origPriceVal = parseFloat(document.getElementById("crud-orig-price").value);
+  const descVal = document.getElementById("crud-desc").value;
+  const stockVal = parseInt(document.getElementById("crud-stock").value);
+  
+  // Use Base64 image if uploaded, otherwise use default
+  const imgB64 = document.getElementById("crud-image-b64").value;
+  const imgPreviewSrc = document.getElementById("crud-image-preview").src;
+  const finalImgVal = imgB64 || (imgPreviewSrc && imgPreviewSrc !== window.location.href ? imgPreviewSrc : "assets/placeholder.png");
+
+  const highlightsRaw = document.getElementById("crud-highlights").value;
+
+  const highlightsVal = highlightsRaw
+    ? highlightsRaw.split(",").map(hl => hl.trim()).filter(hl => hl !== "")
+    : ["100% Organic Remedy", "Formulated by Clinical Experts"];
+
+  const payload = {
+    id: idVal || nameVal.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+    name: nameVal,
+    price: priceVal,
+    originalPrice: origPriceVal,
+    description: descVal,
+    stock: stockVal,
+    image: finalImgVal,
+    sold: 0,
+    category: "General",
+    highlights: highlightsVal
+  };
+
+  if (idVal) {
+    // Edit Mode
+    const product = products.find(p => p.id === idVal);
+    if (product) Object.assign(product, payload);
+  } else {
+    // Add Mode
+    products.push(payload);
+  }
+
+  saveProductsState();
+  
+  // Also sync to backend API silently
+  const token = sessionStorage.getItem("ud_admin_token");
+  if (token) {
+    fetch('/api/admin/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error("Sync error:", err));
+  }
+
+  renderAdminTabContent();
+  toggleAddProductForm();
+};
+
+// Appointment Management
+const changeAptStatus = (aptId, newStatus) => {
+  const apt = appointments.find(a => a.id === aptId);
+  if (!apt) return;
+  apt.status = newStatus;
+  saveAppointmentsState();
+  renderAdminTabContent();
+};
+window.changeAptStatus = changeAptStatus;
+
+const deleteApt = (aptId) => {
+  if (confirm(`Delete appointment record ${aptId}?`)) {
+    appointments = appointments.filter(a => a.id !== aptId);
+    saveAppointmentsState();
+    renderAdminTabContent();
+  }
+};
+window.deleteApt = deleteApt;
+
+// ==========================================================================
+// STORE CHECKOUT & ORDER SUBMISSIONS
+// ==========================================================================
+
+// Modals display trigger
+const checkoutModal = document.getElementById("checkout-modal");
+const checkoutTrigger = document.getElementById("checkout-normal-btn");
+const checkoutClose = document.getElementById("close-checkout-modal-btn");
+const checkoutBgClose = document.getElementById("checkout-modal-close");
+
+if (checkoutTrigger) {
+  checkoutTrigger.addEventListener("click", () => {
+    if (cart.length === 0) return;
+    closeCartDrawer();
+    openCheckoutModal();
+  });
+}
+
+const openCheckoutModal = () => {
+  if (checkoutModal) {
+    checkoutModal.classList.add("open");
+    renderCheckoutSummary();
+  }
+};
+
+const closeCheckoutModal = () => {
+  if (checkoutModal) checkoutModal.classList.remove("open");
+};
+
+if (checkoutClose) checkoutClose.addEventListener("click", closeCheckoutModal);
+if (checkoutBgClose) checkoutBgClose.addEventListener("click", closeCheckoutModal);
+
+const renderCheckoutSummary = () => {
+  const itemsContainer = document.getElementById("checkout-summary-items");
+  const totalText = document.getElementById("checkout-summary-total");
+  if (!itemsContainer) return;
+
+  let total = 0;
+  itemsContainer.innerHTML = cart.map(item => {
+    total += item.price * item.qty;
+    return `
+      <div class="summary-item-row">
+        <span>${item.name} (x${item.qty})</span>
+        <span>₹${item.price * item.qty}</span>
+      </div>
+    `;
+  }).join("");
+
+  if (totalText) totalText.innerText = `₹${total}`;
+};
+
+// Handle Checkout Form Submission (COD / WhatsApp)
+const shippingForm = document.getElementById("shipping-form");
+if (shippingForm) {
+  // COD Standard submission
+  shippingForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    submitOrder("COD");
+  });
+
+  // Direct WhatsApp shipping confirmation
+  const btnWa = document.getElementById("btn-submit-whatsapp");
+  if (btnWa) {
+    btnWa.addEventListener("click", () => {
+      // Trigger validation check manually before sending
+      if (shippingForm.checkValidity()) {
+        submitOrder("WhatsApp");
+      } else {
+        shippingForm.reportValidity();
+      }
+    });
+  }
+
+  // Pincode auto-fill address handler
+  const pinInput = document.getElementById("checkout-pincode");
+  const cityInput = document.getElementById("checkout-city");
+
+  if (pinInput && cityInput) {
+    pinInput.addEventListener("input", async (e) => {
+      const pin = e.target.value.trim();
+      // Indian pincodes are exactly 6 digits
+      if (/^\d{6}$/.test(pin)) {
+        const originalPlaceholder = cityInput.placeholder;
+        cityInput.placeholder = "Auto-fetching City/State...";
+        cityInput.value = "";
+        cityInput.disabled = true;
+
+        try {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+          if (res.ok) {
+            const data = await res.ok ? await res.json() : null;
+            if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice) {
+              const office = data[0].PostOffice[0];
+              const district = office.District;
+              const state = office.State;
+              cityInput.value = `${district}, ${state}`;
+            }
+          }
+        } catch (err) {
+          console.error("Error auto-filling pincode data:", err);
+        } finally {
+          cityInput.disabled = false;
+          cityInput.placeholder = originalPlaceholder;
+        }
+      }
+    });
+  }
+}
+
+// Direct WhatsApp order from Cart Drawer
+const directCartWa = document.getElementById("checkout-whatsapp-direct");
+if (directCartWa) {
+  directCartWa.addEventListener("click", () => {
+    if (cart.length === 0) return;
+    
+    // Generate text message based on cart
+    const cartText = cart.map(item => `- ${item.name} (x${item.qty})`).join("\n");
+    const cartSubtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    
+    const textMsg = encodeURIComponent(
+      `Hello Unani Dawakhana Official, I would like to order:\n\n` +
+      `${cartText}\n\n` +
+      `Subtotal: ₹${cartSubtotal}\n` +
+      `Delivery Mode: Cash on Delivery (COD)\n\n` +
+      `Please confirm my shipping address details.`
+    );
+    
+    // Open WA
+    window.open(`https://wa.me/918796982661?text=${textMsg}`, "_blank");
+  });
+}
+
+const submitOrder = (mode) => {
+  const name = document.getElementById("checkout-name").value;
+  const phone = document.getElementById("checkout-phone").value;
+  const address = document.getElementById("checkout-address").value;
+  const city = document.getElementById("checkout-city").value;
+  const pincode = document.getElementById("checkout-pincode").value;
+
+  if (!/^\d{10}$/.test(phone.trim())) {
+    alert("Please enter a valid 10-digit phone number.");
+    return;
+  }
+
+  const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+  const orderTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const orderItemsText = cart.map(item => `${item.name} (x${item.qty})`).join(", ");
+
+  // Adjust product stocks
+  cart.forEach(item => {
+    const prod = products.find(p => p.id === item.id);
+    if (prod) {
+      prod.stock = Math.max(0, prod.stock - item.qty);
+      prod.sold += item.qty;
+    }
+  });
+  saveProductsState();
+
+  // Save order to backend
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customerName: name,
+      customerPhone: phone,
+      address,
+      city,
+      pincode,
+      paymentMethod: mode === "WhatsApp" ? "WhatsApp" : "COD",
+      totalAmount: orderTotal,
+      items: cart
+    })
+  }).then(res => res.json()).then(data => {
+    if(data.success) {
+      const newOrder = {
+        id: `ORD-${data.id}`,
+        date: new Date().toISOString().split("T")[0],
+        name: name,
+        phone: phone,
+        address: address,
+        city: city,
+        pincode: pincode,
+        productName: orderItemsText,
+        total: orderTotal,
+        status: "New Order",
+        paymentStatus: "Pending"
+      };
+      orders.push(newOrder);
+      saveOrdersState();
+    }
+  }).catch(err => console.error(err));
+
+  // Clear cart
+  cart = [];
+  saveCartState();
+  updateCartBadge();
+  closeCheckoutModal();
+
+  if (mode === "WhatsApp") {
+    // Generate Whatsapp order message
+    const formattedMsg = encodeURIComponent(
+      `Hello Unani Dawakhana Official,\n` +
+      `I would like to confirm my order:\n\n` +
+      `*Order ID:* ${orderId}\n` +
+      `*Remedies:* ${orderItemsText}\n` +
+      `*Total Price:* ₹${orderTotal} (COD)\n\n` +
+      `*Shipping Details:*\n` +
+      `- Name: ${name}\n` +
+      `- Phone: ${phone}\n` +
+      `- Address: ${address}\n` +
+      `- City/Pincode: ${city} - ${pincode}`
+    );
+    window.open(`https://wa.me/918796982661?text=${formattedMsg}`, "_blank");
+    showSuccessPopup("Order Registered!", `Thank you, ${name}. Your order ${orderId} details have been sent via WhatsApp. We will contact you soon.`, orderId);
+  } else {
+    // COD Mode success popup
+    showSuccessPopup("Order Registered!", `Thank you, ${name}. Your Cash on Delivery order ${orderId} has been successfully registered. We will deliver it to ${address} shortly.`, orderId);
+  }
+};
+
+// Invoice Modal Viewer
+const viewInvoice = (orderId) => {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  const modal = document.getElementById("admin-invoice-modal");
+  const modalContent = document.getElementById("invoice-modal-content");
+
+  const itemsHTML = order.productName.split(", ").map(itemStr => {
+    const match = itemStr.match(/(.+?)\s*\(x(\d+)\)/);
+    let name = itemStr;
+    let qty = 1;
+    if (match) {
+      name = match[1];
+      qty = parseInt(match[2]);
+    }
+    const prod = products.find(p => p.name.includes(name) || name.includes(p.name));
+    const price = prod ? prod.price : 999;
+    return `
+      <tr>
+        <td style="padding: 12px; border-bottom: 1px solid var(--border-light); text-align: left;">
+          <strong>${name}</strong><br>
+          <small style="color:var(--text-muted);">Traditional Unani Prep</small>
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid var(--border-light); text-align: center;">₹${price}</td>
+        <td style="padding: 12px; border-bottom: 1px solid var(--border-light); text-align: center;">${qty}</td>
+        <td style="padding: 12px; border-bottom: 1px solid var(--border-light); text-align: right; font-weight: 600;">₹${price * qty}</td>
+      </tr>
+    `;
+  }).join("");
+
+  modalContent.innerHTML = `
+    <div style="font-family: 'Inter', sans-serif; color: var(--text); padding: 10px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px; border-bottom: 2px solid var(--accent); padding-bottom: 16px; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <h1 style="color: var(--primary); font-family: var(--font-heading); font-size: 2rem; margin: 0;">Unani Dawakhana</h1>
+          <p style="color: var(--accent); font-weight: 600; letter-spacing: 1px; margin: 2px 0 0 0; font-size: 0.85rem;">OFFICIAL WELLNESS CLINIC</p>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 6px 0 0 0; line-height: 1.4;">Shaheen Bagh, Jamia Nagar, New Delhi - 110025<br>Phone: +91 8796982661 | ounanidawakhana@gmail.com</p>
+        </div>
+        <div style="text-align: right;">
+          <h2 style="font-size: 1.3rem; color: var(--primary); margin: 0 0 6px 0;">INVOICE</h2>
+          <p style="font-size: 0.8rem; margin: 2px 0;"><strong>Invoice No:</strong> INV-${order.id.split("-")[1] || order.id}</p>
+          <p style="font-size: 0.8rem; margin: 2px 0;"><strong>Date:</strong> ${order.date}</p>
+          <p style="font-size: 0.8rem; margin: 2px 0;"><strong>Status:</strong> <span style="display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background-color: var(--primary-ultra-light); color: var(--primary);">${order.status}</span></p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 24px;">
+        <div>
+          <h4 style="color: var(--accent-dark); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 6px;">PATIENT DETAILS</h4>
+          <p style="font-size: 0.85rem; margin: 2px 0;"><strong>${order.name}</strong></p>
+          <p style="font-size: 0.85rem; margin: 2px 0;">Phone: +91 ${order.phone}</p>
+        </div>
+        <div>
+          <h4 style="color: var(--accent-dark); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 6px;">SHIPPING ADDRESS</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 2px 0;">
+            ${order.address}<br>
+            ${order.city} - ${order.pincode}
+          </p>
+        </div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <thead>
+          <tr style="background-color: var(--primary-ultra-light); color: var(--primary);">
+            <th style="padding: 10px 12px; text-align: left; font-weight: 600; font-size: 0.8rem; border-bottom: 2px solid var(--border-light);">Description</th>
+            <th style="padding: 10px 12px; text-align: center; font-weight: 600; font-size: 0.8rem; border-bottom: 2px solid var(--border-light);">Unit Price</th>
+            <th style="padding: 10px 12px; text-align: center; font-weight: 600; font-size: 0.8rem; border-bottom: 2px solid var(--border-light);">Qty</th>
+            <th style="padding: 10px 12px; text-align: right; font-weight: 600; font-size: 0.8rem; border-bottom: 2px solid var(--border-light);">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHTML}
+        </tbody>
+      </table>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin-bottom: 24px;">
+        <div style="max-width: 320px;">
+          <h4 style="font-size: 0.8rem; color: var(--primary); margin-bottom: 4px;">Clinician Note & Terms</h4>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin: 0;">This invoice is clinically verified by Unani Dawakhana. Products shipped are formulated under certified herbal procedures. Pay on delivery via Cash or UPI scan code.</p>
+        </div>
+        <div style="text-align: right; min-width: 180px;">
+          <div style="display:flex; justify-content:space-between; padding: 4px 0; border-bottom: 1px solid var(--border-light); font-size:0.85rem;">
+            <span>Subtotal:</span>
+            <span>₹${order.total}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding: 4px 0; border-bottom: 1px solid var(--border-light); font-size:0.85rem;">
+            <span>Delivery Fee:</span>
+            <span style="color:var(--success); font-weight:600;">FREE</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding: 10px 0; font-size:1.1rem; font-weight: 700; color: var(--primary);">
+            <span>Total Payable:</span>
+            <span>₹${order.total}</span>
+          </div>
+          <p style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Payment Mode: Cash on Delivery (COD)</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-light);">
+        <div>
+          <div style="width: 80px; height: 80px; border: 3px double var(--accent); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--accent-dark); font-weight: bold; font-size: 0.58rem; transform: rotate(-10deg); opacity: 0.8; user-select: none;">
+            <span>UNANI CLINIC</span>
+            <span style="border-top:1px solid var(--accent); border-bottom:1px solid var(--accent); padding: 1px 0; margin: 1px 0;">VERIFIED</span>
+            <span>DELHI</span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <p style="font-style: italic; font-family: 'Outfit', sans-serif; font-size: 1rem; color: var(--primary); margin: 0;">Dr. Hakim H. K.</p>
+          <div style="width: 120px; border-top: 1px solid var(--primary); margin: 2px 0 0 auto;"></div>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Authorized Signature</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add("open");
+};
+window.viewInvoice = viewInvoice;
+
+const setupInvoiceActions = () => {
+  const modal = document.getElementById("admin-invoice-modal");
+  if (!modal) return;
+
+  const closeBtn = document.getElementById("close-invoice-modal-btn");
+  const closeBtnBottom = document.getElementById("close-invoice-modal-btn-bottom");
+  const bgClose = document.getElementById("admin-invoice-modal-close-bg");
+  const printBtn = document.getElementById("print-invoice-btn");
+
+  const closeModal = () => modal.classList.remove("open");
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (closeBtnBottom) closeBtnBottom.addEventListener("click", closeModal);
+  if (bgClose) bgClose.addEventListener("click", closeModal);
+
+  if (printBtn) {
+    printBtn.addEventListener("click", () => {
+      window.print();
+    });
+  }
+};
+setupInvoiceActions();
+
+// Success Popup display helper
+const successPopup = document.getElementById("success-popup");
+const successTitle = document.getElementById("success-popup-title");
+const successMsg = document.getElementById("success-message");
+const successClose = document.getElementById("success-close-btn");
+const successDownloadBtn = document.getElementById("success-download-btn");
+
+let lastPlacedOrderId = null;
+
+const showSuccessPopup = (title, message, orderId = null) => {
+  lastPlacedOrderId = orderId;
+  if (successPopup && successTitle && successMsg) {
+    successTitle.innerText = title;
+    successMsg.innerText = message;
+    
+    if (orderId && successDownloadBtn) {
+      successDownloadBtn.style.display = "block";
+    } else if (successDownloadBtn) {
+      successDownloadBtn.style.display = "none";
+    }
+    
+    successPopup.classList.add("open");
+  }
+};
+
+if (successClose) {
+  successClose.addEventListener("click", () => {
+    if (successPopup) successPopup.classList.remove("open");
+  });
+}
+
+if (successDownloadBtn) {
+  successDownloadBtn.addEventListener("click", () => {
+    if (successPopup) successPopup.classList.remove("open");
+    if (lastPlacedOrderId) {
+      viewInvoice(lastPlacedOrderId);
+    }
+  });
+}
+
+// ==========================================================================
+// NAVBAR & NAVIGATION TOGGLES
+// ==========================================================================
+const themeToggle = document.getElementById("theme-toggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("ud_theme", newTheme);
+    updateThemeIcons(newTheme);
+  });
+}
+
+const cartTrigger = document.getElementById("cart-trigger");
+const cartDrawerClose = document.getElementById("cart-drawer-close");
+const cartOverlayClose = document.getElementById("cart-overlay-close");
+
+if (cartTrigger) cartTrigger.addEventListener("click", openCartDrawer);
+if (cartDrawerClose) cartDrawerClose.addEventListener("click", closeCartDrawer);
+if (cartOverlayClose) cartOverlayClose.addEventListener("click", closeCartDrawer);
+
+// Mobile Hamburger
+const mobileToggle = document.getElementById("mobile-toggle");
+const mobileDrawer = document.getElementById("mobile-drawer");
+const mobileDrawerClose = document.getElementById("mobile-drawer-close");
+const mobileDrawerOverlay = document.getElementById("mobile-drawer-overlay");
+
+if (mobileToggle && mobileDrawer) {
+  mobileToggle.addEventListener("click", () => {
+    mobileDrawer.classList.add("open");
+  });
+}
+
+const closeMobileDrawer = () => {
+  if (mobileDrawer) mobileDrawer.classList.remove("open");
+};
+
+if (mobileDrawerClose) mobileDrawerClose.addEventListener("click", closeMobileDrawer);
+if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
+
+// Link intercepts for mobile nav
+document.querySelectorAll(".mobile-link").forEach(link => {
+  link.addEventListener("click", closeMobileDrawer);
+});
+
+// ==========================================================================
+// AI HAKEEM CHATBOT LOGIC
+// ==========================================================================
+const aiChatBtn = document.getElementById("ai-chat-btn");
+const aiChatPanel = document.getElementById("ai-chat-panel");
+const aiChatClose = document.getElementById("ai-chat-close");
+const aiChatForm = document.getElementById("ai-chat-form");
+const aiChatInput = document.getElementById("ai-chat-input");
+const aiChatBody = document.getElementById("ai-chat-body");
+
+if (aiChatBtn && aiChatPanel) {
+  aiChatBtn.addEventListener("click", () => {
+    aiChatPanel.classList.toggle("active");
+  });
+
+  aiChatClose.addEventListener("click", () => {
+    aiChatPanel.classList.remove("active");
+  });
+
+  aiChatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = aiChatInput.value.trim();
+    if (!message) return;
+
+    // Add User Message
+    const userMsgDiv = document.createElement("div");
+    userMsgDiv.className = "ai-msg user";
+    userMsgDiv.innerText = message;
+    aiChatBody.appendChild(userMsgDiv);
+    aiChatInput.value = "";
+    aiChatBody.scrollTop = aiChatBody.scrollHeight;
+
+    // Add Loading Indicator
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "ai-msg bot";
+    loadingDiv.innerHTML = "<em>Hakeem Sahab soch rahe hain...</em>";
+    aiChatBody.appendChild(loadingDiv);
+    aiChatBody.scrollTop = aiChatBody.scrollHeight;
+
+    try {
+      const res = await fetch("/api/ai-consult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+
+      // Remove loading indicator
+      aiChatBody.removeChild(loadingDiv);
+
+      // Add Bot Message
+      const botMsgDiv = document.createElement("div");
+      botMsgDiv.className = "ai-msg bot";
+      // Convert markdown-like response to simple text or HTML
+      botMsgDiv.innerHTML = data.reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      aiChatBody.appendChild(botMsgDiv);
+      aiChatBody.scrollTop = aiChatBody.scrollHeight;
+
+    } catch (err) {
+      aiChatBody.removeChild(loadingDiv);
+      const errorMsgDiv = document.createElement("div");
+      errorMsgDiv.className = "ai-msg bot";
+      errorMsgDiv.style.color = "var(--danger)";
+      errorMsgDiv.innerText = "Network Error! Please try again or WhatsApp us.";
+      aiChatBody.appendChild(errorMsgDiv);
+    }
+  });
+}
