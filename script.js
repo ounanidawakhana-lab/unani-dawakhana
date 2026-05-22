@@ -853,7 +853,7 @@ const renderHomeView = (container) => {
           <span style="font-size:1.2rem;">📞</span>
           <div>
             <p style="font-size:0.8rem; font-weight:700; color:#111; margin:0;">Helpline Number</p>
-            <a href="tel:+919876543210" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">+91 98765 43210</a>
+            <a href="tel:+91879698661" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">+91 879698661</a>
           </div>
         </div>
         
@@ -861,7 +861,7 @@ const renderHomeView = (container) => {
           <span style="font-size:1.2rem;">✉️</span>
           <div>
             <p style="font-size:0.8rem; font-weight:700; color:#111; margin:0;">Email Support</p>
-            <a href="mailto:saqibmiftahi69@gmail.com" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">saqibmiftahi69@gmail.com</a>
+            <a href="mailto:ounanidawakhans@gmail.com" style="font-size:0.85rem; color:var(--accent); text-decoration:none; font-weight:600;">ounanidawakhans@gmail.com</a>
           </div>
         </div>
       </div>
