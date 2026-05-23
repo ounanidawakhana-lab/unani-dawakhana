@@ -127,7 +127,7 @@
         </div>
       </div>
 
-      <button class="btn btn-primary" onclick="openCheckoutModal()" style="width:100%; padding:14px; font-size:1.1rem;">Proceed to Checkout</button>
+      <button class="btn btn-primary" onclick="openCheckoutModal()" style="width:100%; padding:14px; font-size:1.1rem;" data-i18n="checkout">Proceed to Checkout</button>
     </div>
   </div>
 
@@ -202,22 +202,22 @@
   <nav class="app-bottom-nav">
     <a href="#home" class="nav-btn active">
       <div class="nav-icon">🏠</div>
-      <span>Home</span>
+      <span data-i18n="home">Home</span>
     </a>
     <a href="#categories" class="nav-btn" onclick="document.querySelector('.category-scroll').scrollIntoView({behavior: 'smooth'})">
       <div class="nav-icon">🗂️</div>
-      <span>Categories</span>
+      <span data-i18n="categories">Categories</span>
     </a>
     <a href="#menu" class="nav-btn">
       <div class="nav-icon">☰</div>
-      <span>Menu</span>
+      <span data-i18n="menu">Menu</span>
     </a>
     <a href="javascript:void(0)" class="nav-btn" onclick="openCartDrawer()">
       <div class="nav-icon" style="position:relative;">
         🛒
         <span class="nav-badge" id="cart-badge-count" style="position:absolute; top:-6px; right:-8px; background:#e91e63; color:#fff; border-radius:50%; width:16px; height:16px; font-size:0.6rem; display:flex; align-items:center; justify-content:center; font-weight:bold;">0</span>
       </div>
-      <span>Cart</span>
+      <span data-i18n="cart">Cart</span>
     </a>
   </nav>
 

@@ -636,10 +636,10 @@ const renderProductDetails = (container, productId) => {
                 <button class="qty-btn" id="det-qty-plus" style="width: 28px; height: 28px;">+</button>
               </div>
               
-              <button class="btn btn-primary" id="det-add-cart-btn" style="height: 50px; flex: 1; min-width: 160px;">Add to Cart</button>
+              <button class="btn btn-primary" id="det-add-cart-btn" style="height: 50px; flex: 1; min-width: 160px;">${window.t('add_to_cart')}</button>
               <button class="btn btn-whatsapp" id="det-buy-wa-btn" style="height: 50px; flex: 1; min-width: 200px;">
                 <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                Buy via WhatsApp
+                ${window.t('buy_whatsapp')}
               </button>
             </div>
 
@@ -2071,34 +2071,36 @@ const submitOrder = async (mode) => {
   updateCartBadge();
   closeCheckoutModal();
 
+  // Generate Whatsapp order message for BOTH COD and Online
+  const paymentText = mode === "Online" ? "Pay Online (Please send QR Code/Payment Link)" : "Cash on Delivery (COD)";
+  const formattedMsg = encodeURIComponent(
+    `Hello Unani Dawakhana Official,\n` +
+    `I would like to confirm my order:\n\n` +
+    `*Order ID:* ${orderId}\n` +
+    `*Remedies:* ${orderItemsText}\n\n` +
+    `*Bill Summary:*\n` +
+    `- Item Total: ₹${orderSubtotal}\n` +
+    (orderTotalGst > 0 ? `- GST/Taxes: ₹${orderTotalGst}\n` : ``) +
+    (orderTotalCharges > 0 ? `- Delivery Charges: ₹${orderTotalCharges}\n` : `- Delivery: FREE\n`) +
+    `- *Grand Total: ₹${orderTotal}*\n\n` +
+    `*Payment Mode:* ${paymentText}\n\n` +
+    `*Shipping Details:*\n` +
+    `- Name: ${name}\n` +
+    `- Phone: ${phone}\n` +
+    `- Address: ${address}\n` +
+    `- City/Pincode: ${city} - ${pincode}`
+  );
+  
+  // ALWAYS open WhatsApp so Admin gets notified
+  window.open(`https://wa.me/918796982661?text=${formattedMsg}`, "_blank");
+
   if (mode === "Online") {
-    // Generate Whatsapp order message
-    const formattedMsg = encodeURIComponent(
-      `Hello Unani Dawakhana Official,\n` +
-      `I would like to confirm my order:\n\n` +
-      `*Order ID:* ${orderId}\n` +
-      `*Remedies:* ${orderItemsText}\n\n` +
-      `*Bill Summary:*\n` +
-      `- Item Total: ₹${orderSubtotal}\n` +
-      (orderTotalGst > 0 ? `- GST/Taxes: ₹${orderTotalGst}\n` : ``) +
-      (orderTotalCharges > 0 ? `- Delivery Charges: ₹${orderTotalCharges}\n` : `- Delivery: FREE\n`) +
-      `- *Grand Total: ₹${orderTotal}*\n\n` +
-      `*Payment Mode:* Pay Online (Please send QR Code/Payment Link)\n\n` +
-      `*Shipping Details:*\n` +
-      `- Name: ${name}\n` +
-      `- Phone: ${phone}\n` +
-      `- Address: ${address}\n` +
-      `- City/Pincode: ${city} - ${pincode}`
-    );
-    window.open(`https://wa.me/918796982661?text=${formattedMsg}`, "_blank");
     showSuccessPopup("Order Registered!", `Thank you, ${name}. Your order ${orderId} details have been sent via WhatsApp. Please complete your online payment there.`, orderId);
   } else {
-    // COD Mode success popup
     showSuccessPopup("Order Registered!", `Thank you, ${name}. Your Cash on Delivery order ${orderId} has been successfully registered. We will deliver it to ${address} shortly.`, orderId);
-    // Redirect to tracker after a short delay so they can see the popup
     setTimeout(() => {
       window.location.hash = "tracker";
-    }, 2000);
+    }, 4000);
   }
 
   if(submitBtn) {
